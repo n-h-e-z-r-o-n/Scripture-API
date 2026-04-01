@@ -15,22 +15,22 @@
       --bg-card-hover: #241B17;
       --border-color: #382A24;
       --border-highlight: #5A443C;
-      
+
       --text-main: #F7EBE1;      /* Warm off-white */
       --text-muted: #A8958A;     /* Muted warm grey */
-      
+
       --accent-gold: #D4A373;    /* Soft Golden Brown */
       --accent-gold-hover: #E6B585;
       --accent-glow: rgba(212, 163, 115, 0.15);
-      
+
       --code-bg: #140E0B;
       --code-text: #E2C9B3;
       --method-get: #D4A373;
-      
+
       --font-ui: 'Inter', -apple-system, sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
     }
-    
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -194,7 +194,7 @@
       align-items: center;
       gap: 0.75rem;
     }
-    
+
     .section-header span {
       font-size: 0.875rem;
       color: var(--text-muted);
@@ -269,7 +269,7 @@
       border-radius: 12px;
       border: 1px solid var(--border-color);
     }
-    
+
     .versions-wrapper h3 {
       font-size: 1.1rem;
       margin-bottom: 1rem;
@@ -339,12 +339,12 @@
 
   <div class="container">
     <div class="glow"></div>
-    
+
     <section class="hero">
       <div class="hero-badge">v1.0 Live Now</div>
       <h1>The high-performance,<br>developer-first <br>Bible data layer.</h1>
       <p>Scripture API provides a globally distributed, low-latency REST API for accessing multi-translation biblical texts with millisecond precision. Built for modern apps.</p>
-      
+
       <div class="btn-group">
         <a href="#endpoints" class="btn btn-primary">API Reference &rarr;</a>
         <a href="#versions" class="btn btn-secondary">View Supported Versions</a>
@@ -372,114 +372,351 @@
       <span>6 Methods Available</span>
     </div>
 
+
+    <!-- Endpoint 0 -->
+    <div class="endpoint-card">
+  <div class="endpoint-header">
+    <div class="endpoint-path">
+      <span class="method">GET</span> /api/versions
+    </div>
+  </div>
+
+  <div class="endpoint-desc">
+    Returns/Detects available bible api Available.
+  </div>
+
+  <div class="code-block">
+  <pre><code>
+  GET /api/versions
+  </code></pre>
+  </div>
+
+  <div class="code-block">
+  <pre><code class="json">
+  {
+  "versions":
+    [
+      "KJbible",
+      "NIVbible"
+    ]
+  }
+  </code></pre>
+  </div>
+  </div>
+
+  <!-- Endpoint 0.1 -->
+  <div class="endpoint-card">
+  <div class="endpoint-header">
+  <div class="endpoint-path">
+    <span class="method">GET</span> /api/metadata
+  </div>
+  </div>
+
+  <div class="endpoint-desc">
+   provides information about the API itself
+  </div>
+
+  <div class="code-block">
+  <pre><code>
+  GET /api/metadata
+  </code></pre>
+  </div>
+
+  <div class="code-block">
+  <pre><code class="json">
+
+  </code></pre>
+  </div>
+  </div>
+
+  <!-- Endpoint 0.2 -->
+  <div class="endpoint-card">
+  <div class="endpoint-header">
+  <div class="endpoint-path">
+    <span class="method">GET</span> /api/health
+  </div>
+  </div>
+
+  <div class="endpoint-desc">
+   report whether your API service is alive and functioning correctly.
+  </div>
+
+  <div class="code-block">
+  <pre><code>
+  GET /api/health
+  </code></pre>
+  </div>
+
+  <div class="code-block">
+  <pre><code class="json">
+    {
+      "status": "ok",
+      "timestamp": "2026-04-01T15:45:12.345Z",
+      "bible_versions": ["KJbible", "NIVbible"],
+      "api_version": "1.0.0",
+      "database": "connected"
+    }
+  </code></pre>
+  </div>
+  </div>
     <!-- Endpoint 1 -->
     <div class="endpoint-card">
-      <div class="endpoint-header">
-        <div class="endpoint-path">
-          <span class="method">GET</span> /api/{version}/book
-        </div>
-      </div>
-      <div class="endpoint-desc">
-        Returns a summary of a specific book, including an array of its available chapters. Requires the <code>name</code> query parameter.
-      </div>
-      <div class="code-block">
-<span class="json-key">"book"</span>: <span class="json-string">"Genesis"</span>,
-<span class="json-key">"chapters"</span>: [
-  <span class="json-string">"1"</span>, <span class="json-string">"2"</span>, <span class="json-string">"3"</span>, <span class="json-string">"..."</span>
-]</div>
+  <div class="endpoint-header">
+    <div class="endpoint-path">
+      <span class="method">GET</span> /api/{version}/book
     </div>
+  </div>
+
+  <div class="endpoint-desc">
+    Returns metadata for a specific book and the list of its chapters.
+    Requires the <code>name</code> query parameter.
+  </div>
+
+  <div class="code-block">
+<pre><code>
+GET /api/KJbible/book?name=Genesis
+</code></pre>
+  </div>
+
+  <div class="code-block">
+<pre><code class="json">
+{
+  "book": "Genesis",
+  "chapters": [1,2,3,4,5,6,"..."]
+}
+</code></pre>
+  </div>
+</div>
 
     <!-- Endpoint 2 -->
     <div class="endpoint-card">
-      <div class="endpoint-header">
-        <div class="endpoint-path">
-          <span class="method">GET</span> /api/{version}/chapter
-        </div>
-      </div>
-      <div class="endpoint-desc">
-        Retrieves all verses within a selected book's chapter. Requires <code>book</code> and <code>chapter</code> query parameters.
-      </div>
-      <div class="code-block">
-<span class="json-key">"book"</span>: <span class="json-string">"Genesis"</span>,
-<span class="json-key">"chapter"</span>: <span class="json-number">1</span>,
-<span class="json-key">"verses"</span>: [
-  {
-    <span class="json-key">"verse"</span>: <span class="json-string">"1"</span>,
-    <span class="json-key">"text"</span>: <span class="json-string">"In the beginning God created the heaven and the earth."</span>
-  }
-]</div>
+  <div class="endpoint-header">
+    <div class="endpoint-path">
+      <span class="method">GET</span> /api/{version}/chapter
     </div>
-    
+  </div>
+
+  <div class="endpoint-desc">
+    Returns all verses inside a specific chapter.
+    Requires <code>book</code> and <code>chapter</code>.
+  </div>
+
+  <div class="code-block">
+<pre><code>
+GET /api/KJbible/chapter?book=Genesis&chapter=1
+</code></pre>
+  </div>
+
+  <div class="code-block">
+<pre><code class="json">
+{
+  "book": "Genesis",
+  "chapter": 1,
+  "verses": [
+    {
+      "verse": 1,
+      "text": "In the beginning God created the heaven and the earth."
+    },
+    {
+      "verse": 2,
+      "text": "And the earth was without form, and void..."
+    }
+  ]
+}
+</code></pre>
+  </div>
+</div>
+
     <!-- Endpoint 3 -->
     <div class="endpoint-card">
-      <div class="endpoint-header">
-        <div class="endpoint-path">
-          <span class="method">GET</span> /api/{version}/verse
-        </div>
-      </div>
-      <div class="endpoint-desc">
-        The core text delivery method. Fetches the exact scriptural content for a specifically targeted single verse.
-      </div>
-      <div class="code-block">
-<span class="json-key">"book"</span>: <span class="json-string">"Genesis"</span>,
-<span class="json-key">"chapter"</span>: <span class="json-number">1</span>,
-<span class="json-key">"verse"</span>: <span class="json-number">1</span>,
-<span class="json-key">"text"</span>: <span class="json-string">"In the beginning God created the heaven and the earth."</span></div>
+  <div class="endpoint-header">
+    <div class="endpoint-path">
+      <span class="method">GET</span> /api/{version}/verse
     </div>
+  </div>
+
+  <div class="endpoint-desc">
+    Fetch a single verse from the selected Bible translation.
+  </div>
+
+  <div class="code-block">
+<pre><code>
+GET /api/KJbible/verse?book=Genesis&chapter=1&verse=1
+</code></pre>
+  </div>
+
+  <div class="code-block">
+<pre><code class="json">
+{
+  "book": "Genesis",
+  "chapter": 1,
+  "verse": 1,
+  "text": "In the beginning God created the heaven and the earth."
+}
+</code></pre>
+  </div>
+</div>
 
     <!-- Endpoint 4 -->
     <div class="endpoint-card">
-      <div class="endpoint-header">
-        <div class="endpoint-path">
-          <span class="method">GET</span> /api/{version}/search
-        </div>
-      </div>
-      <div class="endpoint-desc">
-        Perform a case-insensitive, globally scoped text search across the specified Bible version. Requires the <code>q</code> query parameter.
-      </div>
-      <div class="code-block">
-<span class="json-key">"results"</span>: [
-  {
-    <span class="json-key">"book"</span>: <span class="json-string">"Deuteronomy"</span>,
-    <span class="json-key">"chapter"</span>: <span class="json-number">32</span>,
-    <span class="json-key">"verse"</span>: <span class="json-number">20</span>,
-    <span class="json-key">"text"</span>: <span class="json-string">"And he said, I will hide my face from them..."</span>
-  }
-]</div>
+  <div class="endpoint-header">
+    <div class="endpoint-path">
+      <span class="method">GET</span> /api/{version}/search
     </div>
+  </div>
+
+  <div class="endpoint-desc">
+    Performs a case-insensitive search across the Bible text.
+    Requires the <code>q</code> query parameter.
+  </div>
+
+  <div class="code-block">
+<pre><code>
+GET /api/KJbible/search?q=for god so loved
+</code></pre>
+  </div>
+
+  <div class="code-block">
+<pre><code class="json">
+{
+  "results": [
+    {
+      "book": "John",
+      "chapter": 3,
+      "verse": 16,
+      "text": "For God so loved the world, that he gave his only begotten Son..."
+    }
+  ]
+}
+</code></pre>
+  </div>
+</div>
 
     <!-- Endpoint 5 -->
     <div class="endpoint-card">
-      <div class="endpoint-header">
-        <div class="endpoint-path">
-          <span class="method">GET</span> /api/{version}/books
-        </div>
-      </div>
-      <div class="endpoint-desc">
-        Lists all available standard books currently accessible inside the evaluated payload of the specified version.
-      </div>
-      <div class="code-block">
-<span class="json-key">"books"</span>: [
-  <span class="json-string">"Genesis"</span>, <span class="json-string">"Exodus"</span>, <span class="json-string">"Leviticus"</span>, <span class="json-string">"..."</span>
-]</div>
+  <div class="endpoint-header">
+    <div class="endpoint-path">
+      <span class="method">GET</span> /api/{version}/books
     </div>
+  </div>
+
+  <div class="endpoint-desc">
+    Returns all books available in the selected Bible version.
+  </div>
+
+  <div class="code-block">
+<pre><code>
+GET /api/KJbible/books
+</code></pre>
+  </div>
+
+  <div class="code-block">
+<pre><code class="json">
+{
+  "books": [
+    "Genesis",
+    "Exodus",
+    "Leviticus",
+    "Numbers",
+    "Deuteronomy",
+    "..."
+  ]
+}
+</code></pre>
+  </div>
+</div>
 
     <!-- Endpoint 6 -->
     <div class="endpoint-card">
-      <div class="endpoint-header">
-        <div class="endpoint-path">
-          <span class="method">GET</span> /api/{version}/random
-        </div>
-      </div>
-      <div class="endpoint-desc">
-        Explore serendipitously. Returns a completely randomized verse pulled instantly from anywhere within the dataset.
-      </div>
-      <div class="code-block">
-<span class="json-key">"book"</span>: <span class="json-string">"Psalms"</span>,
-<span class="json-key">"chapter"</span>: <span class="json-number">23</span>,
-<span class="json-key">"verse"</span>: <span class="json-number">1</span>,
-<span class="json-key">"text"</span>: <span class="json-string">"The LORD is my shepherd; I shall not want."</span></div>
+  <div class="endpoint-header">
+    <div class="endpoint-path">
+      <span class="method">GET</span> /api/{version}/random
     </div>
+  </div>
+
+  <div class="endpoint-desc">
+    Returns a randomly selected verse from the dataset.
+  </div>
+
+  <div class="code-block">
+<pre><code>
+GET /api/KJbible/random
+</code></pre>
+  </div>
+
+  <div class="code-block">
+<pre><code class="json">
+{
+  "book": "Psalms",
+  "chapter": 23,
+  "verse": 1,
+  "text": "The LORD is my shepherd; I shall not want."
+}
+</code></pre>
+  </div>
+</div>
+
+<!-- Endpoint 7 -->
+<div class="endpoint-card">
+<div class="endpoint-header">
+<div class="endpoint-path">
+  <span class="method">GET</span> /api/{version}/passage
+</div>
+</div>
+
+<div class="endpoint-desc">
+returns a range of verses from the same chapter.
+</div>
+
+<div class="code-block">
+<pre><code>
+/api/KJbible/passage?book=John&chapter=3&start=16&end=18
+</code></pre>
+</div>
+
+<div class="code-block">
+<pre><code class="json">
+{
+"book": "Psalms",
+"chapter": 23,
+"verse": 1,
+"text": "The LORD is my shepherd; I shall not want."
+}
+</code></pre>
+</div>
+</div>
+
+<!-- Endpoint 8 -->
+<div class="endpoint-card">
+<div class="endpoint-header">
+<div class="endpoint-path">
+  <span class="method">GET</span> /api/{version}/daily
+</div>
+</div>
+
+<div class="endpoint-desc">
+Return one fixed verse per day.Every request that day returns the same verse
+</div>
+
+<div class="code-block">
+<pre><code>
+/api/KJbible/daily
+</code></pre>
+</div>
+
+<div class="code-block">
+<pre><code class="json">
+  {
+   "date": "2026-04-01",
+   "book": "Proverbs",
+   "chapter": 3,
+   "verse": 5,
+   "text": "Trust in the LORD with all thine heart..."
+  }
+</code></pre>
+</div>
+</div>
+
 
   </div>
 
@@ -499,23 +736,23 @@
       try {
         const response = await fetch('/api/versions');
         if (!response.ok) throw new Error('Failed to fetch');
-        
+
         const data = await response.json();
-        
+
         if (data.versions && data.versions.length > 0) {
           container.innerHTML = ''; // Clear loading state
-          
+
           data.versions.forEach(version => {
             const span = document.createElement('span');
             span.className = 'badge';
-            
+
             // Icon
             span.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>`;
-            
+
             // Text
             const textNode = document.createTextNode(` ${version}`);
             span.appendChild(textNode);
-            
+
             container.appendChild(span);
           });
         } else {
