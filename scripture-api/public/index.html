@@ -185,9 +185,8 @@
       <p>Welcome to the Bible API. This API allows developers to easily fetch Bible books, chapters, and verses. The architecture is explicitly designed to be dynamic and to support multiple Bible versions (e.g. KJbible, NIVbible, ESVbible) natively as datasets are added.</p>
       
       <h3>Available Versions</h3>
-      <div class="badge-container">
-        <span class="badge">KJbible (King James Version)</span>
-        <!-- Extensibility hint: Add more spans here in the future -->
+      <div class="badge-container" id="versions-container">
+        <span class="badge" style="opacity: 0.5;">Loading versions...</span>
       </div>
       <p><em>To use the API, replace <code>{version}</code> in the paths below with an available version string.</em></p>
     </section>
@@ -307,5 +306,40 @@
     </section>
 
   </main>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const container = document.getElementById('versions-container');
+      try {
+        const response = await fetch('/api/versions');
+        if (!response.ok) throw new Error('Failed to fetch');
+        
+        const data = await response.json();
+        
+        if (data.versions && data.versions.length > 0) {
+          container.innerHTML = ''; // Clear loading state
+          
+          data.versions.forEach(version => {
+            const span = document.createElement('span');
+            span.className = 'badge';
+            
+            // Add some descriptive text if it's a known version
+            let displayText = version;
+            if (version.toLowerCase() === 'kjbible') displayText += ' (King James Version)';
+            if (version.toLowerCase() === 'nivbible') displayText += ' (New International Version)';
+            if (version.toLowerCase() === 'esvbible') displayText += ' (English Standard Version)';
+            
+            span.textContent = displayText;
+            container.appendChild(span);
+          });
+        } else {
+          container.innerHTML = '<span class="badge" style="opacity: 0.5;">No versions found</span>';
+        }
+      } catch (error) {
+        console.error('Error fetching versions:', error);
+        container.innerHTML = '<span class="badge" style="border-color: #ef4444; color: #ef4444;">Error loading versions</span>';
+      }
+    });
+  </script>
 </body>
 </html>
