@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bible API Documentation</title>
+  <style>
+    :root {
+      --bg-color: #0f172a; /* Tailwind bg-slate-900 */
+      --card-bg: #1e293b; /* Tailwind bg-slate-800 */
+      --text-main: #f8fafc; /* Tailwind text-slate-50 */
+      --text-muted: #94a3b8; /* Tailwind text-slate-400 */
+      --accent: #38bdf8; /* Tailwind text-sky-400 */
+      --code-bg: #0b1120;
+      --code-border: #334155;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+
+    header {
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--code-border);
+      padding: 2rem;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    section {
+      margin-bottom: 3rem;
+    }
+
+    h2 {
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--code-border);
+      padding-bottom: 0.5rem;
+    }
+    
+    h3 {
+      font-size: 1.25rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: var(--accent);
+    }
+
+    p {
+      margin-bottom: 1rem;
+    }
+
+    .endpoint {
+      background-color: var(--card-bg);
+      border: 1px solid var(--code-border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .setup-code {
+      font-family: 'Courier New', Courier, monospace;
+      background-color: #1d4ed8;
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    .method {
+      display: inline-block;
+      background-color: #10b981; /* Default GET green */
+      color: white;
+      font-size: 0.875rem;
+      font-weight: 700;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      margin-right: 0.5rem;
+    }
+
+    code {
+      font-family: 'Fira Code', 'Courier New', Courier, monospace;
+      background-color: var(--code-bg);
+      color: #e2e8f0;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+
+    pre {
+      background-color: var(--code-bg);
+      border: 1px solid var(--code-border);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    pre code {
+      background-color: transparent;
+      padding: 0;
+      color: #a5b4fc;
+    }
+
+    ul {
+      list-style-position: inside;
+      margin-bottom: 1rem;
+      color: var(--text-muted);
+    }
+
+    ul li {
+      margin-bottom: 0.5rem;
+    }
+
+    .badge-container {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .badge {
+      background-color: var(--card-bg);
+      border: 1px solid var(--code-border);
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      color: var(--accent);
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 2rem;
+      }
+      .endpoint {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Bible API</h1>
+    <p>A fast, lightweight, and extensible serverless REST API for Bible verses.</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>Introduction</h2>
+      <p>Welcome to the Bible API. This API allows developers to easily fetch Bible books, chapters, and verses. The architecture is explicitly designed to be dynamic and to support multiple Bible versions (e.g. KJbible, NIVbible, ESVbible) natively as datasets are added.</p>
+      
+      <h3>Available Versions</h3>
+      <div class="badge-container">
+        <span class="badge">KJbible (King James Version)</span>
+        <!-- Extensibility hint: Add more spans here in the future -->
+      </div>
+      <p><em>To use the API, replace <code>{version}</code> in the paths below with an available version string.</em></p>
+    </section>
+
+    <section>
+      <h2>Endpoints</h2>
+
+      <div class="endpoint">
+        <h3><span class="method">GET</span> /api/{version}/book</h3>
+        <p>Retrieve a summary of a specific book, including its available chapters.</p>
+        <p><strong>Query Parameters:</strong></p>
+        <ul>
+          <li><code>name</code> (string) - The name of the book. <em>Example: Genesis</em></li>
+        </ul>
+        <pre><code>GET /api/KJbible/book?name=Genesis</code></pre>
+        <strong>Example Response (200 OK):</strong>
+        <pre><code>{
+  "book": "Genesis",
+  "chapters": ["1", "2", "3", "4", "5", "..."]
+}</code></pre>
+      </div>
+
+      <div class="endpoint">
+        <h3><span class="method">GET</span> /api/{version}/chapter</h3>
+        <p>Retrieve all verses within a specific chapter.</p>
+        <p><strong>Query Parameters:</strong></p>
+        <ul>
+          <li><code>book</code> (string) - The name of the book. <em>Example: Genesis</em></li>
+          <li><code>chapter</code> (number) - The chapter number. <em>Example: 1</em></li>
+        </ul>
+        <pre><code>GET /api/KJbible/chapter?book=Genesis&chapter=1</code></pre>
+        <strong>Example Response (200 OK):</strong>
+        <pre><code>{
+  "book": "Genesis",
+  "chapter": 1,
+  "verses": [
+    {
+      "verse": "1",
+      "text": "In the beginning God created the heaven and the earth."
+    },
+    ...
+  ]
+}</code></pre>
+      </div>
+
+      <div class="endpoint">
+        <h3><span class="method">GET</span> /api/{version}/verse</h3>
+        <p>Retrieve a single, specific verse.</p>
+        <p><strong>Query Parameters:</strong></p>
+        <ul>
+          <li><code>book</code> (string) - The name of the book.</li>
+          <li><code>chapter</code> (number) - The chapter number.</li>
+          <li><code>verse</code> (number) - The verse number.</li>
+        </ul>
+        <pre><code>GET /api/KJbible/verse?book=Genesis&chapter=1&verse=1</code></pre>
+        <strong>Example Response (200 OK):</strong>
+        <pre><code>{
+  "book": "Genesis",
+  "chapter": 1,
+  "verse": 1,
+  "text": "In the beginning God created the heaven and the earth."
+}</code></pre>
+      </div>
+
+      <div class="endpoint">
+        <h3><span class="method">GET</span> /api/{version}/search</h3>
+        <p>Search all verses in the provided version for a specific term or phrase. Results are capped at 100.</p>
+        <p><strong>Query Parameters:</strong></p>
+        <ul>
+          <li><code>q</code> (string) - The search query term. <em>Example: faith</em></li>
+        </ul>
+        <pre><code>GET /api/KJbible/search?q=faith</code></pre>
+        <strong>Example Response (200 OK):</strong>
+        <pre><code>{
+  "results": [
+    {
+      "book": "Deuteronomy",
+      "chapter": 32,
+      "verse": 20,
+      "text": "And he said, I will hide my face from them..."
+    },
+    ...
+  ]
+}</code></pre>
+      </div>
+
+      <div class="endpoint">
+        <h3><span class="method">GET</span> /api/{version}/books</h3>
+        <p>List all available books in the specified version. (Optional Tooling Endpoint)</p>
+        <pre><code>GET /api/KJbible/books</code></pre>
+        <strong>Example Response (200 OK):</strong>
+        <pre><code>{
+  "books": ["Genesis", "Exodus", "Leviticus", ...]
+}</code></pre>
+      </div>
+
+      <div class="endpoint">
+        <h3><span class="method">GET</span> /api/{version}/random</h3>
+        <p>Retrieve a random verse from any book or chapter.</p>
+        <pre><code>GET /api/KJbible/random</code></pre>
+        <strong>Example Response (200 OK):</strong>
+        <pre><code>{
+  "book": "Psalms",
+  "chapter": 23,
+  "verse": 1,
+  "text": "The LORD is my shepherd; I shall not want."
+}</code></pre>
+      </div>
+    </section>
+    
+    <section>
+      <h2>Error Handling</h2>
+      <p>If an invalid parameter or missing version is provided, the API will respond with appropriate standard HTTP status codes combined with clear error messages.</p>
+      <pre><code>{
+  "error": "Bible version 'NIVbible' not found."
+}</code></pre>
+    </section>
+
+  </main>
+</body>
+</html>
