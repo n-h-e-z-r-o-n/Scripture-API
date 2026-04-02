@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getBibleData } from '@/lib/bibleUtils';
+import { corsHeaders, getBibleData, toNum } from '@/lib/bibleUtils';
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: corsHeaders });
+}
 
 export async function GET(
   request: NextRequest,
@@ -14,13 +18,16 @@ export async function GET(
   if (!query) {
     return NextResponse.json(
       { error: "Query parameter 'q' is required. Ex: /api/KJbible/search?q=faith" },
-      { status: 400 }
+      { status: 400, headers: corsHeaders }
     );
   }
 
   const bibleData = await getBibleData(version);
   if (!bibleData) {
-    return NextResponse.json({ error: `Bible version '${version}' not found.` }, { status: 404 });
+    return NextResponse.json(
+      { error: `Bible version '${version}' not found. Use /api/versions to see available versions.` },
+      { status: 404, headers: corsHeaders }
+    );
   }
 
   const lowerQuery = query.toLowerCase();
@@ -35,22 +42,37 @@ export async function GET(
         if (verse.text.toLowerCase().includes(lowerQuery)) {
           results.push({
             book: book.book,
-            chapter: parseInt(chapter.chapter) || chapter.chapter,
-            verse: parseInt(verse.verse) || verse.verse,
+            chapter: toNum(chapter.chapter),
+            verse: toNum(verse.verse),
             text: verse.text
           });
           
           if (results.length >= MAX_RESULTS) {
-            return NextResponse.json({
-              results,
-              limitReached: true,
-              message: `Results capped at ${MAX_RESULTS}.`
-            });
+            return NextResponse.json(
+              {
+                version,
+                query,
+                count: results.length,
+                limitReached: true,
+                message: `Results capped at ${MAX_RESULTS}.`,
+                results,
+              },
+              { headers: corsHeaders }
+            );
           }
         }
       }
     }
   }
 
-  return NextResponse.json({ results });
+  return NextResponse.json(
+    {
+      version,
+      query,
+      count: results.length,
+      limitReached: false,
+      results,
+    },
+    { headers: corsHeaders }
+  );
 }

@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getBibleData } from '@/lib/bibleUtils';
+import { corsHeaders, getBibleData, toNum } from '@/lib/bibleUtils';
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: corsHeaders });
+}
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ bible: string }> }
 ) {
   const resolvedParams = await params;
@@ -10,7 +14,10 @@ export async function GET(
 
   const bibleData = await getBibleData(version);
   if (!bibleData) {
-    return NextResponse.json({ error: `Bible version '${version}' not found.` }, { status: 404 });
+    return NextResponse.json(
+      { error: `Bible version '${version}' not found. Use /api/versions to see available versions.` },
+      { status: 404, headers: corsHeaders }
+    );
   }
 
   // Pick a random book
@@ -25,10 +32,14 @@ export async function GET(
   const randomVerseIndex = Math.floor(Math.random() * chapter.verses.length);
   const verse = chapter.verses[randomVerseIndex];
 
-  return NextResponse.json({
-    book: book.book,
-    chapter: parseInt(chapter.chapter) || chapter.chapter,
-    verse: parseInt(verse.verse) || verse.verse,
-    text: verse.text
-  });
+  return NextResponse.json(
+    {
+      version,
+      book: book.book,
+      chapter: toNum(chapter.chapter),
+      verse: toNum(verse.verse),
+      text: verse.text,
+    },
+    { headers: corsHeaders }
+  );
 }
