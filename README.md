@@ -717,7 +717,7 @@ Please ensure:
 
 
 ## Legal & Responsible Use
-> [!CAUTION]
+> [!CAUTION  Please read this section before using, modifying, or deploying this project ]
 > Please read this section before using, modifying, or deploying this project.
 > ### Purpose of the Project
 >
