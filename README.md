@@ -24,7 +24,14 @@
 
 ## Overview
 
-`Scripture-API` is a high-performance Next.js API service designed to provide instantaneous JSON responses for local Bible translation datasets. It lazily loads datasets into server memory, negating the need for a database, and exposes highly structured dynamic REST endpoints for books, chapters, daily verses, and robust search functionality.
+Scripture-API is a RESTful API designed to provide structured access to Bible texts and related metadata. It delivers fast, reliable JSON responses for querying translations, books, chapters, verses, passages, and search results.
+
+The API offers a consistent set of endpoints that allow developers to retrieve scripture content programmatically, making it suitable for applications such as Bible study tools, educational platforms, church software, and personal projects.
+
+By providing a simple and predictable interface, Scripture-API enables developers to integrate Bible data into their applications quickly while maintaining clarity and reliability across all endpoints.
+
+Perfect for Bible apps, church platforms, devotionals, meme generators, or whatever chaotic Christian project you're cooking.
+
 
 Public demo endpoint: https://scripture-api.vercel.app/
 
