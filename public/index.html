@@ -354,12 +354,17 @@
     <section id="versions" class="versions-wrapper">
       <h3>Auto-Detected Translations</h3>
       <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">
-        The system dynamically scans the datasets available on the server. To query the API, replace <code>{bible}</code> in the endpoints with one of the identifiers below.
+        datasets available on the server. To query the API, replace <code>{bible}</code> in the endpoints with one of the identifiers below.
       </p>
       <div class="badge-container" id="versions-container">
         <span class="badge" style="opacity: 0.5;">Scanning datasets...</span>
       </div>
     </section>
+
+   <div class="versions-wrapper">
+    <strong>Base URL:</strong> <span class="method" id="base-url"></span><br>
+   </div>
+
 
     <div class="section-header" id="endpoints">
       <h2>
@@ -566,7 +571,7 @@
   </div>
 
 
-    
+
 
   <!-- Endpoint 0.5 -->
   <div class="endpoint-card">
@@ -698,18 +703,19 @@ GET /api/KJbible/verse?book=Genesis&chapter=1&verse=1
     <div class="endpoint-card">
   <div class="endpoint-header">
     <div class="endpoint-path">
-      <span class="method">GET</span> /api/{bible}/search
+      <span class="method">GET</span> GET /api/{bible}/search?q={query}
     </div>
   </div>
 
   <div class="endpoint-desc">
-    Performs a case-insensitive search across the Bible text.
-    Requires the <code>q</code> query parameter.
+    Performs a case-insensitive text search across the specified Bible translation. Returns all verses that contain the exact query string..
   </div>
 
   <div class="code-block">
 <pre><code>
-GET /api/KJbible/search?q=for god so loved
+  GET /api/KJbible/search?q=faith
+  GET /api/NIVbible/search?q=hope
+  GET /api/KJbible/search?q=for god so loved
 </code></pre>
   </div>
 
@@ -727,6 +733,42 @@ GET /api/KJbible/search?q=for god so loved
 }
 </code></pre>
   </div>
+</div>
+
+<!-- Endpoint 5 -->
+<div class="endpoint-card">
+<div class="endpoint-header">
+<div class="endpoint-path">
+  <span class="method">GET</span> /api/{bible}/topic/{keyword}
+</div>
+</div>
+
+<div class="endpoint-desc">
+Fetches a curated list of verses associated with a specific topic or theme. Unlike /search, this endpoint returns verses tagged under a concept, even if the exact keyword does not appear in the verse text.
+</div>
+
+<div class="code-block">
+<pre><code>
+  GET /api/KJbible/topic/faith
+  GET /api/KJbible/topic/love
+  GET /api/NIVbible/topic/hope
+</code></pre>
+</div>
+
+<div class="code-block">
+<pre><code class="json">
+  {
+    "version": "KJbible",
+    "topic": "faith",
+    "count": 3,
+    "results": [
+      { "book": "Hebrews", "chapter": 11, "verse": 1, "text": "Now faith is the substance of things hoped for..." },
+      { "book": "Romans", "chapter": 10, "verse": 17, "text": "So then faith cometh by hearing, and hearing by the word of God." },
+      { "book": "Matthew", "chapter": 17, "verse": 20, "text": "If ye have faith as a grain of mustard seed..." }
+    ]
+  }
+</code></pre>
+</div>
 </div>
 
     <!-- Endpoint 5 -->
@@ -797,13 +839,12 @@ GET /api/KJbible/random
 <div class="endpoint-card">
 <div class="endpoint-header">
 <div class="endpoint-path">
-  <span class="method">GET</span> /api/{bible}/passage
+  <span class="method">GET</span> GET /api/{bible}/passage?book={book}&chapter={chapter}&start={start}&end={end}
 </div>
 </div>
 
 <div class="endpoint-desc">
-returns a range of verses from the same chapter.
-</div>
+Retrieves a contiguous range of verses from a specific book and chapter. This is ideal for fetching passages for devotional reading, lessons, or study notes.</div>
 
 <div class="code-block">
 <pre><code>
@@ -827,13 +868,54 @@ returns a range of verses from the same chapter.
 <div class="endpoint-card">
 <div class="endpoint-header">
 <div class="endpoint-path">
+  <span class="method">GET</span> /app/api/[bible]/ref/[reference]
+</div>
+</div>
+
+<div class="endpoint-desc">
+Fetches one or multiple verses from a Bible translation using a human-readable reference string. Supports single verses, verse ranges, and ranges spanning multiple chapters.
+</div>
+
+<div class="code-block">
+<pre><code>
+Single verse: GET /api/KJbible/ref/John 3:16
+Verse range (same chapter): GET /api/KJbible/ref/John 3:16-18
+Multi-chapter range: GET /api/KJbible/ref/Genesis 1:31-2:3
+</code></pre>
+</div>
+
+<div class="code-block">
+<pre><code class="json">
+  {
+    "version": "KJbible",
+    "book": "Genesis",
+    "start": { "chapter": 1, "verse": 31 },
+    "end": { "chapter": 2, "verse": 3 },
+    "verseCount": 4,
+    "verses": [
+      { "chapter": 1, "verse": 31, "text": "And God saw everything that he had made..." },
+      { "chapter": 2, "verse": 1, "text": "Thus the heavens and the earth were finished..." },
+      { "chapter": 2, "verse": 2, "text": "And on the seventh day God ended his work..." },
+      { "chapter": 2, "verse": 3, "text": "And God blessed the seventh day..." }
+    ]
+  }
+</code></pre>
+</div>
+</div>
+
+<!-- Endpoint 9 -->
+<div class="endpoint-card">
+<div class="endpoint-header">
+<div class="endpoint-path">
   <span class="method">GET</span> /api/{bible}/daily
 </div>
 </div>
 
 <div class="endpoint-desc">
 Return one fixed verse per day.Every request that day returns the same verse
+Returns the Verse of the Day for the specified Bible translation. This is a pre-determined verse based on the current date and can be used for daily devotionals or app notifications.
 </div>
+
 
 <div class="code-block">
 <pre><code>
@@ -869,7 +951,7 @@ Return one fixed verse per day.Every request that day returns the same verse
 
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
-      const container = document.getElementById('versions-container');
+      const biblVersionsContainer = document.getElementById('versions-container');
       try {
         const response = await fetch('/api/versions');
         if (!response.ok) throw new Error('Failed to fetch');
@@ -877,7 +959,7 @@ Return one fixed verse per day.Every request that day returns the same verse
         const data = await response.json();
 
         if (data.versions && data.versions.length > 0) {
-          container.innerHTML = ''; // Clear loading state
+          biblVersionsContainer.innerHTML = ''; // Clear loading state
 
           data.versions.forEach(version => {
             const span = document.createElement('span');
@@ -887,17 +969,22 @@ Return one fixed verse per day.Every request that day returns the same verse
             span.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>`;
 
             // Text
-            const textNode = document.createTextNode(` ${bible}`);
+            const textNode = document.createTextNode(` ${version}`);
             span.appendChild(textNode);
 
-            container.appendChild(span);
+            biblVersionsContainer.appendChild(span);
           });
         } else {
-          container.innerHTML = '<span class="badge" style="opacity: 0.5;">No versions found</span>';
+          biblVersionsContainer.innerHTML = '<span class="badge" style="opacity: 0.5;">No versions found</span>';
         }
       } catch (error) {
-        container.innerHTML = '<span class="badge" style="color: #ef4444; border-color: #ef4444;">Error loading versions</span>';
+        biblVersionsContainer.innerHTML = '<span class="badge" style="color: #ef4444; border-color: #ef4444;">Error loading versions</span>';
       }
+
+      const BaseURLcontainer = document.getElementById('base-url');
+      var origin = window.location && window.location.origin ? window.location.origin : "/";
+      BaseURLcontainer.textContent = origin;
+
     });
   </script>
 </body>
