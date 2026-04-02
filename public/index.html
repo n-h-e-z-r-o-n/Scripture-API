@@ -533,6 +533,41 @@
   </div>
   </div>
 
+  <!-- Endpoint 0.4 -->
+  <div class="endpoint-card">
+  <div class="endpoint-header">
+  <div class="endpoint-path">
+    <span class="method">GET</span> /api/{bible}/bookOrder
+  </div>
+  </div>
+
+  <div class="endpoint-desc">
+   This endpoint returns the ordered list of books in the specified Bible version.
+   </div>
+  <div class="code-block">
+  <pre><code>
+  GET  /api/KJbible/bookOrder
+  </code></pre>
+  </div>
+
+  <div class="code-block">
+  <pre><code class="json">
+    {
+  "books": [
+    "Genesis",
+    "Exodus",
+    "Leviticus",
+    "Numbers",
+    "Deuteronomy",
+    "Joshua",
+     ....
+  </code></pre>
+  </div>
+  </div>
+
+
+    
+
   <!-- Endpoint 0.5 -->
   <div class="endpoint-card">
   <div class="endpoint-header">
