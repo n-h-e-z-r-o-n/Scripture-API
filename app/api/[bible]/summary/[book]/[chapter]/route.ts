@@ -1,20 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getBibleData, findBook } from "@/lib/bibleUtils";
+import { getBibleData, findBook, findChapter, toNum } from "@/lib/bibleUtils";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ bible: string; book: string; chapter: string }> }
 ) {
   const { bible, book, chapter } = await params;
-
-  const chapterNumber = Number(chapter);
-
-  if (isNaN(chapterNumber)) {
-    return NextResponse.json(
-      { error: "Chapter must be a number." },
-      { status: 400 }
-    );
-  }
 
   const bibleData = await getBibleData(bible);
 
@@ -34,23 +25,20 @@ export async function GET(
     );
   }
 
-  const chapterData = bookData.chapters.find(
-    (c) => c.chapter === chapterNumber
-  );
+  const chapterData = findChapter(bookData, chapter);
 
   if (!chapterData) {
     return NextResponse.json(
-      { error: `Chapter '${chapterNumber}' not found in '${book}'.` },
+      { error: `Chapter '${chapter}' not found in '${book}'.` },
       { status: 404 }
     );
   }
 
   const verseCount = chapterData.verses.length;
-
   return NextResponse.json(
     {
       book: bookData.book,
-      chapter: chapterNumber,
+      chapter: toNum(chapterData.chapter),
       verses: verseCount
     },
     {
