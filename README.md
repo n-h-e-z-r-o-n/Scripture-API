@@ -26,6 +26,9 @@
 
 `Scripture-API` is a high-performance Next.js API service designed to provide instantaneous JSON responses for local Bible translation datasets. It lazily loads datasets into server memory, negating the need for a database, and exposes highly structured dynamic REST endpoints for books, chapters, daily verses, and robust search functionality.
 
+Public demo endpoint: https://scripture-api.vercel.app/
+
+
 ## Key Features
 
 - **Blazing Fast**: Serves data directly from local memory using Next.js App Router, requiring no external database lookup.
@@ -709,57 +712,56 @@ Please ensure:
 ## Legal & Responsible Use
 > [!CAUTION]
 > Please read this section before using, modifying, or deploying this project.
-
-### Purpose of the Project
-
-This project is an **open-source API framework** designed to provide structured access to Bible text datasets. It is intended for **educational, personal study, research, and software development purposes**.
-
-The repository contains **API logic, routing, and data processing utilities only**.
-
-### Public Domain Translations
-
-The project is designed to work with **Bible translations that are in the public domain**. Public domain works are texts whose copyrights have expired or have been explicitly released for unrestricted use.
-
-Examples of commonly recognized public-domain translations include:
-
-* American Standard Version (ASV – 1901)
-* King James Version (KJV – 1611 / 1769 edition)
-* Webster Bible (1833)
-* World English Bible (WEB – public domain text)
-
-These translations are generally considered safe for distribution and reuse. However, users should verify the legal status of any dataset they include.
-
-### No Copyrighted Translations Included
-
-This repository **does not include or distribute copyrighted Bible translations**.
-
-Modern translations such as (but not limited to):
-
-* New International Version (NIV)
-* English Standard Version (ESV)
-* New Living Translation (NLT)
-* Christian Standard Bible (CSB)
-
-are protected by copyright and require permission or licensing from their respective publishers.
-
-### Dataset Responsibility
-
-The repository does **not bundle Bible datasets** by default. If you add datasets to the `/data` directory or elsewhere:
-
-* You are responsible for verifying that the text is **legally distributable**.
-* You must ensure that you comply with **copyright laws and licensing requirements** in your jurisdiction.
-* The maintainers of this project assume **no responsibility for improperly distributed datasets**.
-
-### Distribution and Hosting
-
-If you deploy or distribute this API:
-
-* Only host **public-domain translations** unless you possess a valid license.
-* Do not distribute copyrighted Bible texts without explicit permission from the rights holder.
-
-### Disclaimer
-
-This project is provided **“as is” without warranties of any kind**. The maintainers make no guarantees regarding the legality of datasets added by third parties.
-
-Users and deployers of this project are solely responsible for ensuring that their usage complies with applicable copyright laws and licensing terms.
+> ### Purpose of the Project
+>
+> This project is an **open-source API framework** designed to provide structured access to Bible text datasets. It is intended for **educational, personal study, research, and software development purposes**.
+> 
+> The repository contains **API logic, routing, and data processing utilities only**.
+> 
+> ### Public Domain Translations
+> 
+> The project is designed to work with **Bible translations that are in the public domain**. Public domain works are texts whose copyrights have expired or have been explicitly released for unrestricted use.
+> 
+> Examples of commonly recognized public-domain translations include:
+> 
+> * American Standard Version (ASV – 1901)
+> * King James Version (KJV – 1611 / 1769 edition)
+> * Webster Bible (1833)
+> * World English Bible (WEB – public domain text)
+> 
+> These translations are generally considered safe for distribution and reuse. However, users should verify the legal status of any dataset they include.
+> 
+> ### No Copyrighted Translations Included
+> 
+> This repository **does not include or distribute copyrighted Bible translations**.
+> 
+> Modern translations such as (but not limited to):
+> 
+> * New International Version (NIV)
+> * English Standard Version (ESV)
+> * New Living Translation (NLT)
+> * Christian Standard Bible (CSB)
+> 
+> are protected by copyright and require permission or licensing from their respective publishers.
+> 
+> ### Dataset Responsibility
+> 
+> The repository does **not bundle Bible datasets** by default. If you add datasets to the `/data` directory or elsewhere:
+> 
+> * You are responsible for verifying that the text is **legally distributable**.
+> * You must ensure that you comply with **copyright laws and licensing requirements** in your jurisdiction.
+> * The maintainers of this project assume **no responsibility for improperly distributed datasets**.
+> 
+> ### Distribution and Hosting
+> 
+> If you deploy or distribute this API:
+> 
+> * Only host **public-domain translations** unless you possess a valid license.
+> * Do not distribute copyrighted Bible texts without explicit permission from the rights holder.
+> 
+> ### Disclaimer
+> 
+> This project is provided **“as is” without warranties of any kind**. The maintainers make no guarantees regarding the legality of datasets added by third parties.
+> 
+> Users and deployers of this project are solely responsible for ensuring that their usage complies with applicable copyright laws and licensing terms.
 
