@@ -354,7 +354,7 @@
     <section id="versions" class="versions-wrapper">
       <h3>Auto-Detected Translations</h3>
       <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">
-        The system dynamically scans the datasets available on the server. To query the API, replace <code>{version}</code> in the endpoints with one of the identifiers below.
+        The system dynamically scans the datasets available on the server. To query the API, replace <code>{bible}</code> in the endpoints with one of the identifiers below.
       </p>
       <div class="badge-container" id="versions-container">
         <span class="badge" style="opacity: 0.5;">Scanning datasets...</span>
@@ -459,11 +459,51 @@
   </code></pre>
   </div>
   </div>
+
+  <!-- Endpoint 0.3 -->
+  <div class="endpoint-card">
+  <div class="endpoint-header">
+  <div class="endpoint-path">
+    <span class="method">GET</span> /api/{bible}/summary
+  </div>
+  </div>
+
+  <div class="endpoint-desc">
+  This response gives all bible navigation metadata in one cal
+
+  </div>
+
+  <div class="code-block">
+  <pre><code>
+  GET /api/KJbible/books/summary
+  </code></pre>
+  </div>
+
+  <div class="code-block">
+  <pre><code class="json">
+    {
+    "books": [
+      {
+        "name": "Genesis",
+        "chapters": 50,
+        "verses": 1533,
+        "chapterSummary": [
+          { "chapter": 1, "verses": 31 },
+          { "chapter": 2, "verses": 25 },
+          { "chapter": 3, "verses": 24 }
+        ]
+      }
+    ]
+  }
+  </code></pre>
+  </div>
+  </div>
+
     <!-- Endpoint 1 -->
     <div class="endpoint-card">
   <div class="endpoint-header">
     <div class="endpoint-path">
-      <span class="method">GET</span> /api/{version}/book
+      <span class="method">GET</span> /api/{bible}/book
     </div>
   </div>
 
@@ -492,7 +532,7 @@ GET /api/KJbible/book?name=Genesis
     <div class="endpoint-card">
   <div class="endpoint-header">
     <div class="endpoint-path">
-      <span class="method">GET</span> /api/{version}/chapter
+      <span class="method">GET</span> /api/{bible}/chapter
     </div>
   </div>
 
@@ -531,7 +571,7 @@ GET /api/KJbible/chapter?book=Genesis&chapter=1
     <div class="endpoint-card">
   <div class="endpoint-header">
     <div class="endpoint-path">
-      <span class="method">GET</span> /api/{version}/verse
+      <span class="method">GET</span> /api/{bible}/verse
     </div>
   </div>
 
@@ -561,7 +601,7 @@ GET /api/KJbible/verse?book=Genesis&chapter=1&verse=1
     <div class="endpoint-card">
   <div class="endpoint-header">
     <div class="endpoint-path">
-      <span class="method">GET</span> /api/{version}/search
+      <span class="method">GET</span> /api/{bible}/search
     </div>
   </div>
 
@@ -596,7 +636,7 @@ GET /api/KJbible/search?q=for god so loved
     <div class="endpoint-card">
   <div class="endpoint-header">
     <div class="endpoint-path">
-      <span class="method">GET</span> /api/{version}/books
+      <span class="method">GET</span> /api/{bible}/books
     </div>
   </div>
 
@@ -630,7 +670,7 @@ GET /api/KJbible/books
     <div class="endpoint-card">
   <div class="endpoint-header">
     <div class="endpoint-path">
-      <span class="method">GET</span> /api/{version}/random
+      <span class="method">GET</span> /api/{bible}/random
     </div>
   </div>
 
@@ -660,7 +700,7 @@ GET /api/KJbible/random
 <div class="endpoint-card">
 <div class="endpoint-header">
 <div class="endpoint-path">
-  <span class="method">GET</span> /api/{version}/passage
+  <span class="method">GET</span> /api/{bible}/passage
 </div>
 </div>
 
@@ -690,7 +730,7 @@ returns a range of verses from the same chapter.
 <div class="endpoint-card">
 <div class="endpoint-header">
 <div class="endpoint-path">
-  <span class="method">GET</span> /api/{version}/daily
+  <span class="method">GET</span> /api/{bible}/daily
 </div>
 </div>
 
@@ -750,7 +790,7 @@ Return one fixed verse per day.Every request that day returns the same verse
             span.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>`;
 
             // Text
-            const textNode = document.createTextNode(` ${version}`);
+            const textNode = document.createTextNode(` ${bible}`);
             span.appendChild(textNode);
 
             container.appendChild(span);
