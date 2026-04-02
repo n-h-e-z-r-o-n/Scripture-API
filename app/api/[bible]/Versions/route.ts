@@ -1,17 +1,34 @@
-import { NextResponse } from "next/server";
-import fs from "fs/promises";
-import path from "path";
+import { NextRequest, NextResponse } from 'next/server';
+import { corsHeaders, getBibleData, getAvailableVersions } from '@/lib/bibleUtils';
 
-export async function GET() {
-  const dataDir = path.join(process.cwd(), "data");
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: corsHeaders });
+}
 
-  const files = await fs.readdir(dataDir);
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ bible: string }> }
+) {
+  const { bible } = await params;
 
-  const versions = files
-    .filter((f) => f.endsWith(".json"))
-    .map((f) => f.replace(".json", ""));
+  try {
+    const versions = await getAvailableVersions();
+    const bibleData = await getBibleData(bible);
 
-  return NextResponse.json({
-    versions
-  });
+    return NextResponse.json(
+      {
+        requestedVersion: bible,
+        exists: Boolean(bibleData),
+        versions,
+        count: versions.length,
+      },
+      { headers: corsHeaders }
+    );
+  } catch (error) {
+    console.error('Failed to read versions', error);
+    return NextResponse.json(
+      { error: 'Failed to read available versions' },
+      { status: 500, headers: corsHeaders }
+    );
+  }
 }
