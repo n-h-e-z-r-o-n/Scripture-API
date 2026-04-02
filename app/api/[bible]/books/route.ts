@@ -1,19 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getBibleData } from '@/lib/bibleUtils';
+import { getBibleData, corsHeaders } from '@/lib/bibleUtils';
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: corsHeaders });
+}
 
 export async function GET(
-  request: NextRequest,
+  _req: NextRequest,
   { params }: { params: Promise<{ bible: string }> }
 ) {
-  const resolvedParams = await params;
-  const version = resolvedParams.bible;
+  const { bible } = await params;
 
-  const bibleData = await getBibleData(version);
+  const bibleData = await getBibleData(bible);
   if (!bibleData) {
-    return NextResponse.json({ error: `Bible version '${version}' not found.` }, { status: 404 });
+    return NextResponse.json(
+      { error: `Bible version '${bible}' not found. Use /api/versions to see available versions.` },
+      { status: 404, headers: corsHeaders }
+    );
   }
 
-  return NextResponse.json({
-    books: bibleData.map(b => b.book)
-  });
+  return NextResponse.json(
+    {
+      version: bible,
+      count: bibleData.length,
+      books: bibleData.map((b) => ({
+        name: b.book,
+        chapters: b.chapters.length,
+      })),
+    },
+    { headers: corsHeaders }
+  );
 }

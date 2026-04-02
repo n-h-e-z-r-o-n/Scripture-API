@@ -1,36 +1,50 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getBibleData, findBook } from '@/lib/bibleUtils';
+import { getBibleData, findBook, corsHeaders } from '@/lib/bibleUtils';
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: corsHeaders });
+}
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ bible: string }> } // In Next 15+ Server Components / App Router, params are promises
+  { params }: { params: Promise<{ bible: string }> }
 ) {
-  const resolvedParams = await params;
-  const version = resolvedParams.bible;
-  
-  const searchParams = request.nextUrl.searchParams;
-  const bookName = searchParams.get('name');
+  const { bible } = await params;
+  const bookName = request.nextUrl.searchParams.get('name');
 
   if (!bookName) {
     return NextResponse.json(
-      { error: "Query parameter 'name' is required. Ex: /api/KJbible/book?name=Genesis" },
-      { status: 400 }
+      { error: "Query parameter 'name' is required. Example: /api/KJbible/book?name=Genesis" },
+      { status: 400, headers: corsHeaders }
     );
   }
 
-  const bibleData = await getBibleData(version);
+  const bibleData = await getBibleData(bible);
   if (!bibleData) {
-    return NextResponse.json({ error: `Bible version '${version}' not found.` }, { status: 404 });
+    return NextResponse.json(
+      { error: `Bible version '${bible}' not found. Use /api/versions to see available versions.` },
+      { status: 404, headers: corsHeaders }
+    );
   }
 
   const book = findBook(bibleData, bookName);
   if (!book) {
-    return NextResponse.json({ error: `Book '${bookName}' not found.` }, { status: 404 });
+    return NextResponse.json(
+      { error: `Book '${bookName}' not found in version '${bible}'.` },
+      { status: 404, headers: corsHeaders }
+    );
   }
 
-  // Return book summary (name + chapters without their full verses optionally, or just chapters numbers)
-  return NextResponse.json({
-    book: book.book,
-    chapters: book.chapters.map(c => c.chapter)
-  });
+  return NextResponse.json(
+    {
+      version: bible,
+      book: book.book,
+      chapterCount: book.chapters.length,
+      chapters: book.chapters.map((c) => ({
+        chapter: parseInt(String(c.chapter), 10) || c.chapter,
+        verseCount: c.verses.length,
+      })),
+    },
+    { headers: corsHeaders }
+  );
 }
