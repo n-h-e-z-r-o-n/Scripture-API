@@ -10,15 +10,6 @@
   <a href="#license-recommendation"><img src="https://img.shields.io/badge/License-Guidance-4b9b68" alt="License Guidance"></a>
 </p>
 
-## Legal & Responsible Use
-
-> [!CAUTION]
-> Read this section before using or deploying the project.
->
-> - **Educational, personal, and research use only.**
-> - **Copyright on Translations:** While many historical translations (like the KJV or ASV) are in the public domain, contemporary translations (like the NIV, ESV, NLT) are heavily copyrighted by their respective publishers.
-> - **Your responsibility:** You are solely responsible for ensuring you have the legal right or appropriate licenses to use, host, and distribute any specific Bible translation datasets within the `/data` directory of your deployment.
-> - **No provided datasets:** This repository does not distribute copyrighted religious texts. It is merely a technical routing engine designed to parse any structurally identical valid JSON file.
 
 ## <span id="table-of-contents">Table of Contents</span>
 
@@ -41,6 +32,17 @@
 - **Dynamic Translation Support**: Automatically parses any `.json` file placed into the `/data` directory and serves it dynamically at `/api/[bible]/`.
 - **Comprehensive API**: Granular fetching mechanisms including endpoints for books, chapters, passages, metadata, statistics, and full-text search.
 - **Serverless Ready**: Designed cleanly to be deployed directly to Vercel and leverage Edge caching mechanisms out of the box.
+
+## Project Status
+
+Scripture-API is currently **stable and actively maintained**.
+
+Planned improvements may include:
+
+- Additional dataset validation
+- Improved search indexing
+- Expanded metadata endpoints
+- Optional caching strategies for large datasets
 
 ## Quick Start
 
@@ -683,3 +685,81 @@ console.log(data);
 [🔼 Back to Top](#table-of-contents)
 
 </details>
+
+
+## Contributing
+
+Contributions are welcome.
+
+If you wish to improve Scripture-API:
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Open a Pull Request
+
+Please ensure:
+
+- Code follows the existing project structure
+- Endpoints remain backward compatible
+- Documentation is updated when new endpoints are added
+
+
+
+## Legal & Responsible Use
+> [!CAUTION]
+> Please read this section before using, modifying, or deploying this project.
+
+### Purpose of the Project
+
+This project is an **open-source API framework** designed to provide structured access to Bible text datasets. It is intended for **educational, personal study, research, and software development purposes**.
+
+The repository contains **API logic, routing, and data processing utilities only**.
+
+### Public Domain Translations
+
+The project is designed to work with **Bible translations that are in the public domain**. Public domain works are texts whose copyrights have expired or have been explicitly released for unrestricted use.
+
+Examples of commonly recognized public-domain translations include:
+
+* American Standard Version (ASV – 1901)
+* King James Version (KJV – 1611 / 1769 edition)
+* Webster Bible (1833)
+* World English Bible (WEB – public domain text)
+
+These translations are generally considered safe for distribution and reuse. However, users should verify the legal status of any dataset they include.
+
+### No Copyrighted Translations Included
+
+This repository **does not include or distribute copyrighted Bible translations**.
+
+Modern translations such as (but not limited to):
+
+* New International Version (NIV)
+* English Standard Version (ESV)
+* New Living Translation (NLT)
+* Christian Standard Bible (CSB)
+
+are protected by copyright and require permission or licensing from their respective publishers.
+
+### Dataset Responsibility
+
+The repository does **not bundle Bible datasets** by default. If you add datasets to the `/data` directory or elsewhere:
+
+* You are responsible for verifying that the text is **legally distributable**.
+* You must ensure that you comply with **copyright laws and licensing requirements** in your jurisdiction.
+* The maintainers of this project assume **no responsibility for improperly distributed datasets**.
+
+### Distribution and Hosting
+
+If you deploy or distribute this API:
+
+* Only host **public-domain translations** unless you possess a valid license.
+* Do not distribute copyrighted Bible texts without explicit permission from the rights holder.
+
+### Disclaimer
+
+This project is provided **“as is” without warranties of any kind**. The maintainers make no guarantees regarding the legality of datasets added by third parties.
+
+Users and deployers of this project are solely responsible for ensuring that their usage complies with applicable copyright laws and licensing terms.
+
