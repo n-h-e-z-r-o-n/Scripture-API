@@ -835,6 +835,101 @@ GET /api/KJbible/random
   </div>
 </div>
 
+<!-- Endpoint 6 -->
+<div class="endpoint-card">
+<div class="endpoint-header">
+<div class="endpoint-path">
+  <span class="method">GET</span> /api/{bible}/random/{book}
+</div>
+</div>
+
+<div class="endpoint-desc">
+Returns a Random Verse From the specified Book.
+</div>
+
+<div class="code-block">
+<pre><code>
+GET GET /api/KJbible/random/Genesis
+</code></pre>
+</div>
+
+<div class="code-block">
+<pre><code class="json">
+  {
+    "version": "KJbible",
+    "book": "Genesis",
+    "chapter": 15,
+    "verse": 6,
+    "text": "And he believed in the LORD; and he counted it to him for righteousness."
+  }
+</code></pre>
+</div>
+</div>
+
+<!-- Endpoint 6 -->
+<div class="endpoint-card">
+<div class="endpoint-header">
+<div class="endpoint-path">
+  <span class="method">GET</span> /api/{bible}/random/old-testament
+</div>
+</div>
+
+<div class="endpoint-desc">
+This endpoint returns a random verse from the New Testament (39) books
+</div>
+
+<div class="code-block">
+<pre><code>
+GET  /api/KJbible/random/old-testament
+</code></pre>
+</div>
+
+<div class="code-block">
+<pre><code class="json">
+  {
+    "version": "KJbible",
+    "testament": "Old",
+    "book": "Isaiah",
+    "chapter": 41,
+    "verse": 10,
+    "text": "Fear thou not; for I am with thee: be not dismayed; for I am thy God..."
+  }
+</code></pre>
+</div>
+</div>
+
+<!-- Endpoint 6 -->
+<div class="endpoint-card">
+<div class="endpoint-header">
+<div class="endpoint-path">
+  <span class="method">GET</span> /api/{bible}/random/new-testament
+</div>
+</div>
+
+<div class="endpoint-desc">
+This endpoint returns a random verse from the New Testament (27 books
+</div>
+
+<div class="code-block">
+<pre><code>
+GET  /api/KJbible/random/new-testament
+</code></pre>
+</div>
+
+<div class="code-block">
+<pre><code class="json">
+  {
+    "version": "KJbible",
+    "testament": "Old",
+    "book": "Isaiah",
+    "chapter": 41,
+    "verse": 10,
+    "text": "Fear thou not; for I am with thee: be not dismayed; for I am thy God..."
+  }
+</code></pre>
+</div>
+</div>
+
 <!-- Endpoint 7 -->
 <div class="endpoint-card">
 <div class="endpoint-header">
