@@ -9,33 +9,29 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      /* Golden Brown Dark Theme */
-      --bg-base: #100C0A;        /* Very dark brown/black */
-      --bg-card: #1C1512;        /* Card background */
-      --bg-card-hover: #241B17;
-      --border-color: #382A24;
-      --border-highlight: #5A443C;
+      /* Elevated Golden Brown Dark Theme */
+      --bg-base: #0A0806;        /* Deeper black/brown */
+      --bg-card: rgba(28, 21, 18, 0.4); /* Glass card */
+      --bg-card-hover: rgba(36, 27, 23, 0.6);
+      --border-color: rgba(56, 42, 36, 0.5);
+      --border-highlight: rgba(212, 163, 115, 0.4);
 
-      --text-main: #F7EBE1;      /* Warm off-white */
-      --text-muted: #A8958A;     /* Muted warm grey */
+      --text-main: #FDFBF9;      /* Warmer, brighter white */
+      --text-muted: #BFAEA3;     /* Softer muted tone */
 
-      --accent-gold: #D4A373;    /* Soft Golden Brown */
+      --accent-gold: #D4A373;    
       --accent-gold-hover: #E6B585;
-      --accent-glow: rgba(212, 163, 115, 0.15);
+      --accent-glow: rgba(212, 163, 115, 0.2);
 
-      --code-bg: #140E0B;
-      --code-text: #E2C9B3;
+      --code-bg: rgba(15, 11, 9, 0.8);
+      --code-text: #EADCD0;
       --method-get: #D4A373;
 
       --font-ui: 'Inter', -apple-system, sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: var(--font-ui);
@@ -46,15 +42,35 @@
       overflow-x: hidden;
     }
 
+    /* Ambient glow */
+    .glow {
+      position: absolute;
+      top: -150px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(212, 163, 115, 0.15) 0%, rgba(10, 8, 6, 0) 70%);
+      z-index: -1;
+      pointer-events: none;
+      animation: pulseGlow 8s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulseGlow {
+      0% { opacity: 0.8; transform: translateX(-50%) scale(0.95); }
+      100% { opacity: 1; transform: translateX(-50%) scale(1.05); }
+    }
+
     /* Navigation */
     nav {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 1.5rem 5%;
+      padding: 1.25rem 5%;
       border-bottom: 1px solid var(--border-color);
-      background: rgba(16, 12, 10, 0.8);
-      backdrop-filter: blur(12px);
+      background: rgba(10, 8, 6, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       position: sticky;
       top: 0;
       z-index: 100;
@@ -67,29 +83,24 @@
       font-weight: 700;
       font-size: 1.25rem;
       letter-spacing: -0.02em;
-      color: var(--text-main);
     }
 
     .brand-icon {
-      width: 24px;
-      height: 24px;
+      width: 28px;
+      height: 28px;
       background: linear-gradient(135deg, var(--accent-gold), #8C6239);
-      border-radius: 6px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
+      box-shadow: 0 4px 12px rgba(212, 163, 115, 0.2);
     }
 
-    /* Layout */
-    .container {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 0 2rem;
-    }
+    .container { max-width: 1000px; margin: 0 auto; padding: 0 2rem; position: relative; }
 
-    /* Hero Section */
+    /* Hero */
     .hero {
-      padding: 6rem 0 4rem;
+      padding: 8rem 0 5rem;
       text-align: left;
       position: relative;
     }
@@ -100,57 +111,65 @@
       gap: 0.5rem;
       background: var(--accent-glow);
       color: var(--accent-gold);
-      padding: 0.35rem 0.85rem;
+      padding: 0.4rem 1rem;
       border-radius: 99px;
       font-size: 0.75rem;
       font-weight: 600;
       letter-spacing: 0.05em;
       text-transform: uppercase;
-      margin-bottom: 1.5rem;
+      margin-bottom: 2rem;
       border: 1px solid rgba(212, 163, 115, 0.3);
+      backdrop-filter: blur(8px);
     }
 
     .hero-badge::before {
       content: '';
-      width: 6px;
-      height: 6px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       background: var(--accent-gold);
-      box-shadow: 0 0 8px var(--accent-gold);
+      box-shadow: 0 0 12px var(--accent-gold);
+      animation: pulseDot 2s infinite;
+    }
+
+    @keyframes pulseDot {
+      0% { box-shadow: 0 0 0 0 rgba(212, 163, 115, 0.4); }
+      70% { box-shadow: 0 0 0 6px rgba(212, 163, 115, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(212, 163, 115, 0); }
     }
 
     .hero h1 {
-      font-size: clamp(2.5rem, 5vw, 4rem);
-      line-height: 1.1;
+      font-size: clamp(3rem, 6vw, 4.5rem);
+      line-height: 1.05;
       font-weight: 800;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.04em;
       margin-bottom: 1.5rem;
-      color: var(--text-main);
+      background: linear-gradient(180deg, #FFFFFF 0%, #D8C3B3 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .hero p {
       font-size: 1.25rem;
       color: var(--text-muted);
       max-width: 600px;
-      margin-bottom: 2.5rem;
+      margin-bottom: 3rem;
+      line-height: 1.7;
     }
 
-    .btn-group {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
+    .btn-group { display: flex; gap: 1rem; flex-wrap: wrap; }
 
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 0.875rem 1.75rem;
+      padding: 0.875rem 2rem;
       border-radius: 8px;
       font-size: 1rem;
-      font-weight: 500;
+      font-weight: 600;
       text-decoration: none;
-      transition: all 0.2s ease;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       cursor: pointer;
     }
 
@@ -158,65 +177,64 @@
       background: var(--accent-gold);
       color: var(--bg-base);
       border: none;
+      box-shadow: 0 0 20px rgba(212, 163, 115, 0.2);
     }
-
     .btn-primary:hover {
       background: var(--accent-gold-hover);
-      transform: translateY(-1px);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(212, 163, 115, 0.3);
     }
 
     .btn-secondary {
-      background: transparent;
+      background: rgba(255, 255, 255, 0.03);
       color: var(--text-main);
       border: 1px solid var(--border-color);
+      backdrop-filter: blur(8px);
     }
-
     .btn-secondary:hover {
-      background: var(--bg-card-hover);
+      background: rgba(255, 255, 255, 0.08);
       border-color: var(--border-highlight);
+      transform: translateY(-2px);
     }
 
     /* Section Headers */
     .section-header {
-      margin: 5rem 0 2rem;
+      margin: 6rem 0 3rem;
       display: flex;
       align-items: baseline;
       justify-content: space-between;
       border-bottom: 1px solid var(--border-color);
-      padding-bottom: 1rem;
+      padding-bottom: 1.5rem;
     }
-
     .section-header h2 {
-      font-size: 1.5rem;
+      font-size: 1.75rem;
       font-weight: 600;
-      color: var(--text-main);
       display: flex;
       align-items: center;
       gap: 0.75rem;
     }
 
-    .section-header span {
-      font-size: 0.875rem;
-      color: var(--text-muted);
-    }
-
-    /* Endpoints list */
-    .endpoint-card {
+    /* Cards */
+    .endpoint-card, .versions-wrapper {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
-      border-radius: 12px;
-      margin-bottom: 2rem;
+      border-radius: 16px;
+      margin-bottom: 2.5rem;
       overflow: hidden;
-      transition: border-color 0.2s;
+      backdrop-filter: blur(12px);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     }
-
     .endpoint-card:hover {
       border-color: var(--border-highlight);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
     }
 
     .endpoint-header {
-      padding: 1.25rem 1.5rem;
+      padding: 1.25rem 1.75rem;
       border-bottom: 1px solid var(--border-color);
+      background: rgba(0, 0, 0, 0.2);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -229,98 +247,175 @@
       align-items: center;
       gap: 1rem;
       font-family: var(--font-mono);
-      font-size: 0.95rem;
+      font-size: 1rem;
+      color: var(--text-main);
     }
 
     .method {
       background: var(--accent-glow);
       color: var(--method-get);
-      padding: 0.25rem 0.6rem;
-      border-radius: 4px;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
       font-size: 0.75rem;
       font-weight: 700;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.1em;
+      border: 1px solid rgba(212, 163, 115, 0.2);
     }
 
     .endpoint-desc {
-      padding: 1.5rem;
+      padding: 1.75rem;
       color: var(--text-muted);
       border-bottom: 1px solid var(--border-color);
+      font-size: 1.05rem;
+    }
+
+    .code-block-wrapper {
+      position: relative;
     }
 
     .code-block {
       background: var(--code-bg);
-      padding: 1.5rem;
+      padding: 1.5rem 1.75rem;
       font-family: var(--font-mono);
-      font-size: 0.875rem;
+      font-size: 0.9rem;
       color: var(--code-text);
       overflow-x: auto;
+      border-bottom: 1px solid var(--border-color);
     }
+    .code-block:last-child { border-bottom: none; }
 
-    .json-key { color: #8C6239; }
-    .json-string { color: #A8958A; }
-    .json-number { color: #D4A373; }
-
-    /* Versions Container */
-    .versions-wrapper {
-      margin-top: 3rem;
-      padding: 2rem;
-      background: var(--bg-card);
-      border-radius: 12px;
+    .copy-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border-color);
-    }
-
-    .versions-wrapper h3 {
-      font-size: 1.1rem;
-      margin-bottom: 1rem;
-      font-weight: 600;
-    }
-
-    .badge-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      margin-bottom: 1rem;
-    }
-
-    .badge {
-      background: var(--bg-base);
-      border: 1px solid var(--border-highlight);
-      padding: 0.4rem 1rem;
+      color: var(--text-muted);
+      padding: 0.4rem 0.8rem;
       border-radius: 6px;
+      font-family: var(--font-ui);
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      opacity: 0;
+      transition: all 0.2s;
+      backdrop-filter: blur(4px);
+    }
+    .code-block-wrapper:hover .copy-btn { opacity: 1; }
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-main);
+      border-color: var(--border-highlight);
+    }
+    .copy-btn.copied {
+      background: rgba(46, 160, 67, 0.15);
+      color: #3FB950;
+      border-color: rgba(63, 185, 80, 0.4);
+    }
+
+    .versions-wrapper { padding: 2.5rem; margin-top: 4rem; }
+    .versions-wrapper h3 { font-size: 1.25rem; margin-bottom: 1rem; font-weight: 600; }
+    
+    .badge-container { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.5rem; }
+    .badge {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-color);
+      padding: 0.5rem 1.25rem;
+      border-radius: 8px;
+      font-family: var(--font-mono);
       font-size: 0.875rem;
       color: var(--accent-gold);
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+      transition: all 0.2s;
     }
-
-    /* Ambient glow */
-    .glow {
-      position: absolute;
-      top: -100px;
-      left: -100px;
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, rgba(212, 163, 115, 0.1) 0%, rgba(20, 14, 11, 0) 70%);
-      z-index: -1;
-      pointer-events: none;
-    }
+    .badge:hover { border-color: var(--accent-gold); background: var(--accent-glow); }
 
     /* Footer */
     footer {
       text-align: center;
       padding: 4rem 2rem;
       border-top: 1px solid var(--border-color);
-      margin-top: 4rem;
+      margin-top: 5rem;
       color: var(--text-muted);
       font-size: 0.875rem;
     }
 
     @media (max-width: 768px) {
-      .hero h1 { font-size: 2.5rem; }
+      .hero { padding: 5rem 0 3rem; }
       .endpoint-header { flex-direction: column; align-items: flex-start; }
+      .copy-btn { opacity: 1; }
+    }
+    /* Try It Console */
+    .try-it-container {
+      padding: 1.5rem 1.75rem;
+      background: rgba(10, 8, 6, 0.4);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+    }
+    
+    .try-input-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .try-input-group span {
+      color: var(--accent-gold);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+    }
+
+    .try-input {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    
+    .try-input:focus {
+      border-color: var(--accent-gold);
+    }
+    
+    .try-btn {
+      background: rgba(212, 163, 115, 0.1);
+      color: var(--accent-gold);
+      border: 1px solid var(--accent-gold);
+      padding: 0.45rem 1rem;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+      margin-left: auto;
+    }
+
+    .try-btn:hover {
+      background: var(--accent-gold);
+      color: var(--bg-base);
+    }
+
+    .try-btn.loading {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    /* Scroll Animations */
+    .fade-in-up {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .fade-in-up.visible {
+      opacity: 1;
+      transform: translateY(0);
     }
   </style>
 </head>
@@ -387,8 +482,8 @@
   </div>
 
   <div class="endpoint-desc">
-    Returns/Detects available bible api Available.
-  </div>
+    Lists all available Bible translation datasets loaded on the server.
+</div>
 
   <div class="code-block">
   <pre><code>
@@ -418,8 +513,8 @@
   </div>
 
   <div class="endpoint-desc">
-   provides information about the API itself
-  </div>
+   Returns system-level metadata and configuration for the API.
+</div>
 
   <div class="code-block">
   <pre><code>
@@ -443,8 +538,8 @@
   </div>
 
   <div class="endpoint-desc">
-   report whether your API service is alive and functioning correctly.
-  </div>
+   Checks if the API engine is alive and reports system uptime.
+</div>
 
   <div class="code-block">
   <pre><code>
@@ -474,9 +569,8 @@
   </div>
 
   <div class="endpoint-desc">
-  This response gives all bible navigation metadata in one cal
-
-  </div>
+  Aggregates metadata for the entire specified Bible translation.
+</div>
 
   <div class="code-block">
   <pre><code>
@@ -513,8 +607,8 @@
   </div>
 
   <div class="endpoint-desc">
-   single-book summary endpoint.
-  </div>
+   Returns total chapters and verse configurations for a specific book.
+</div>
 
   <div class="code-block">
   <pre><code>
@@ -547,8 +641,8 @@
   </div>
 
   <div class="endpoint-desc">
-   This endpoint returns the ordered list of books in the specified Bible version.
-   </div>
+   Returns the chronological order of books for the specified translation.
+</div>
   <div class="code-block">
   <pre><code>
   GET  /api/KJbible/bookOrder
@@ -582,8 +676,8 @@
   </div>
 
   <div class="endpoint-desc">
-   This endpoint returns a chapter summary
-  </div>
+   Provides verse count and metadata for a specific chapter.
+</div>
 
   <div class="code-block">
   <pre><code>
@@ -610,9 +704,8 @@
   </div>
 
   <div class="endpoint-desc">
-    Returns metadata for a specific book and the list of its chapters.
-    Requires the <code>name</code> query parameter.
-  </div>
+    Fetches metadata and an overview of chapters for the specified book.
+</div>
 
   <div class="code-block">
 <pre><code>
@@ -639,9 +732,8 @@ GET /api/KJbible/book?name=Genesis
   </div>
 
   <div class="endpoint-desc">
-    Returns all verses inside a specific chapter.
-    Requires <code>book</code> and <code>chapter</code>.
-  </div>
+    Retrieves all verses within a specific chapter.
+</div>
 
   <div class="code-block">
 <pre><code>
@@ -678,8 +770,8 @@ GET /api/KJbible/chapter?book=Genesis&chapter=1
   </div>
 
   <div class="endpoint-desc">
-    Fetch a single verse from the selected Bible translation.
-  </div>
+    Fetches the exact text of a specified verse.
+</div>
 
   <div class="code-block">
 <pre><code>
@@ -703,13 +795,13 @@ GET /api/KJbible/verse?book=Genesis&chapter=1&verse=1
     <div class="endpoint-card">
   <div class="endpoint-header">
     <div class="endpoint-path">
-      <span class="method">GET</span> GET /api/{bible}/search?q={query}
+      <span class="method">GET</span> /api/{bible}/search?q={query}
     </div>
   </div>
 
   <div class="endpoint-desc">
-    Performs a case-insensitive text search across the specified Bible translation. Returns all verses that contain the exact query string..
-  </div>
+    Executes a global text search across the specified translation.
+</div>
 
   <div class="code-block">
 <pre><code>
@@ -744,7 +836,7 @@ GET /api/KJbible/verse?book=Genesis&chapter=1&verse=1
 </div>
 
 <div class="endpoint-desc">
-Fetches a curated list of verses associated with a specific topic or theme. Unlike /search, this endpoint returns verses tagged under a concept, even if the exact keyword does not appear in the verse text.
+Retrieves a curated list of verses relating to a specific topic or theme.
 </div>
 
 <div class="code-block">
@@ -780,8 +872,8 @@ Fetches a curated list of verses associated with a specific topic or theme. Unli
   </div>
 
   <div class="endpoint-desc">
-    Returns all books available in the selected Bible version.
-  </div>
+    Returns a simple list of all books available in the active translation.
+</div>
 
   <div class="code-block">
 <pre><code>
@@ -814,8 +906,8 @@ GET /api/KJbible/books
   </div>
 
   <div class="endpoint-desc">
-    Returns a randomly selected verse from the dataset.
-  </div>
+    Fetches a strictly random verse from the active translation.
+</div>
 
   <div class="code-block">
 <pre><code>
@@ -844,12 +936,12 @@ GET /api/KJbible/random
 </div>
 
 <div class="endpoint-desc">
-Returns a Random Verse From the specified Book.
+Fetches a strictly random verse from the specified book.
 </div>
 
 <div class="code-block">
 <pre><code>
-GET GET /api/KJbible/random/Genesis
+GET /api/KJbible/random/Genesis
 </code></pre>
 </div>
 
@@ -875,7 +967,7 @@ GET GET /api/KJbible/random/Genesis
 </div>
 
 <div class="endpoint-desc">
-This endpoint returns a random verse from the New Testament (39) books
+Fetches a random verse exclusively from the Old Testament (39 books).
 </div>
 
 <div class="code-block">
@@ -907,7 +999,7 @@ GET  /api/KJbible/random/old-testament
 </div>
 
 <div class="endpoint-desc">
-This endpoint returns a random verse from the New Testament (27 books
+Fetches a random verse exclusively from the New Testament (27 books).
 </div>
 
 <div class="code-block">
@@ -920,11 +1012,11 @@ GET  /api/KJbible/random/new-testament
 <pre><code class="json">
   {
     "version": "KJbible",
-    "testament": "Old",
-    "book": "Isaiah",
-    "chapter": 41,
-    "verse": 10,
-    "text": "Fear thou not; for I am with thee: be not dismayed; for I am thy God..."
+    "testament": "New",
+    "book": "John",
+    "chapter": 3,
+    "verse": 16,
+    "text": "For God so loved the world..."
   }
 </code></pre>
 </div>
@@ -934,12 +1026,13 @@ GET  /api/KJbible/random/new-testament
 <div class="endpoint-card">
 <div class="endpoint-header">
 <div class="endpoint-path">
-  <span class="method">GET</span> GET /api/{bible}/passage?book={book}&chapter={chapter}&start={start}&end={end}
+  <span class="method">GET</span> /api/{bible}/passage?book={book}&chapter={chapter}&start={start}&end={end}
 </div>
 </div>
 
 <div class="endpoint-desc">
-Retrieves a contiguous range of verses from a specific book and chapter. This is ideal for fetching passages for devotional reading, lessons, or study notes.</div>
+Retrieves a contiguous block of verses across a chapter.
+</div>
 
 <div class="code-block">
 <pre><code>
@@ -968,7 +1061,7 @@ Retrieves a contiguous range of verses from a specific book and chapter. This is
 </div>
 
 <div class="endpoint-desc">
-Fetches one or multiple verses from a Bible translation using a human-readable reference string. Supports single verses, verse ranges, and ranges spanning multiple chapters.
+Parses human-readable strings (e.g., "John 3:16") into verse text.
 </div>
 
 <div class="code-block">
@@ -1080,6 +1173,154 @@ Returns the Verse of the Day for the specified Bible translation. This is a pre-
       var origin = window.location && window.location.origin ? window.location.origin : "/";
       BaseURLcontainer.textContent = origin;
 
+    });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      
+      // 1. Scroll Animations
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+
+      document.querySelectorAll('.endpoint-card, .section-header, .versions-wrapper').forEach(el => {
+        el.classList.add('fade-in-up');
+        observer.observe(el);
+      });
+
+      // 2. Interactive "Try It" Parsing & Copy Buttons
+      document.querySelectorAll('.endpoint-card').forEach(card => {
+        
+        // Setup Copy Buttons
+        card.querySelectorAll('.code-block').forEach(block => {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'code-block-wrapper';
+          block.parentNode.insertBefore(wrapper, block);
+          wrapper.appendChild(block);
+
+          const btn = document.createElement('button');
+          btn.className = 'copy-btn';
+          btn.innerText = 'Copy';
+          
+          btn.addEventListener('click', () => {
+            const text = block.innerText.trim();
+            navigator.clipboard.writeText(text).then(() => {
+              btn.innerText = 'Copied!';
+              btn.classList.add('copied');
+              setTimeout(() => {
+                btn.innerText = 'Copy';
+                btn.classList.remove('copied');
+              }, 2000);
+            });
+          });
+          wrapper.appendChild(btn);
+        });
+
+        // Setup "Try It" UI
+        const pathEl = card.querySelector('.endpoint-path');
+        if (!pathEl) return;
+        
+        let pathText = pathEl.innerText.replace('GET', '').replace('GET', '').trim();
+        const paramMatches = [...pathText.matchAll(/\{([^}]+)\}/g)];
+        
+        // If there are parameters to fill, or it's a static path we can still test
+        const responseBlocks = card.querySelectorAll('.code-block');
+        const jsonBlock = responseBlocks.length > 1 ? responseBlocks[1] : null;
+        
+        if (jsonBlock) {
+          const tryItContainer = document.createElement('div');
+          tryItContainer.className = 'try-it-container';
+          
+          let defaultInputs = {
+            'bible': 'KJbible',
+            'book': 'Genesis',
+            'chapter': '1',
+            'verse': '1',
+            'keyword': 'faith',
+            'query': 'hope',
+            'reference': 'John 3:16',
+            'start': '1',
+            'end': '3'
+          };
+
+          const inputs = {};
+
+          paramMatches.forEach(match => {
+            const paramName = match[1];
+            const group = document.createElement('div');
+            group.className = 'try-input-group';
+            
+            const label = document.createElement('span');
+            label.innerText = `{${paramName}}`;
+            
+            const input = document.createElement('input');
+            input.className = 'try-input';
+            input.type = 'text';
+            input.placeholder = paramName;
+            input.value = defaultInputs[paramName] || '';
+            
+            inputs[paramName] = input;
+            
+            group.appendChild(label);
+            group.appendChild(input);
+            tryItContainer.appendChild(group);
+          });
+
+          const testBtn = document.createElement('button');
+          testBtn.className = 'try-btn';
+          testBtn.innerText = 'Test API';
+          tryItContainer.appendChild(testBtn);
+
+          // Insert below description, before code blocks
+          const desc = card.querySelector('.endpoint-desc');
+          if (desc) {
+            desc.parentNode.insertBefore(tryItContainer, desc.nextSibling);
+          }
+
+          testBtn.addEventListener('click', async () => {
+            testBtn.classList.add('loading');
+            testBtn.innerText = 'Fetching...';
+
+            let finalUrl = pathText;
+            Object.keys(inputs).forEach(key => {
+              finalUrl = finalUrl.replace(`{${key}}`, encodeURIComponent(inputs[key].value));
+            });
+
+            // Strip out duplicated ? if they hardcoded query params like ?book={book}
+            try {
+              let fetchUrl = finalUrl;
+              // Clean up GET just in case
+              fetchUrl = fetchUrl.replace(/^GET\s*/g, '');
+              
+              const res = await fetch(fetchUrl);
+              const data = await res.json();
+              
+              // Find the inner code tag
+              const codeElem = jsonBlock.querySelector('code');
+              if (codeElem) {
+                codeElem.innerText = JSON.stringify(data, null, 2);
+              }
+              
+              testBtn.innerText = 'Success!';
+              setTimeout(() => { testBtn.innerText = 'Test API'; }, 2000);
+            } catch (err) {
+              const codeElem = jsonBlock.querySelector('code');
+              if (codeElem) {
+                codeElem.innerText = JSON.stringify({ error: err.message }, null, 2);
+              }
+              testBtn.innerText = 'Failed';
+              setTimeout(() => { testBtn.innerText = 'Test API'; }, 2000);
+            } finally {
+              testBtn.classList.remove('loading');
+            }
+          });
+        }
+      });
     });
   </script>
 </body>

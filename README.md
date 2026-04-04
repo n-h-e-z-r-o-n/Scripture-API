@@ -558,6 +558,119 @@ console.log(data);
 <details>
 <summary>
 
+### `GET` Random Verse from Book
+
+</summary>
+
+#### Endpoint
+
+```bash
+/api/[bible]/random/[book]
+```
+
+#### Request Sample
+
+```javascript
+const resp = await fetch("/api/KJV/random/Genesis");
+const data = await resp.json();
+console.log(data);
+```
+
+#### Response Schema
+
+```javascript
+{
+  version: "KJV",
+  book: "Genesis",
+  chapter: 15,
+  verse: 6,
+  text: "And he believed in the LORD; and he counted it to him for righteousness."
+}
+```
+
+[🔼 Back to Top](#table-of-contents)
+
+</details>
+
+<details>
+<summary>
+
+### `GET` Random Old Testament Verse
+
+</summary>
+
+#### Endpoint
+
+```bash
+/api/[bible]/random/old-testament
+```
+
+#### Request Sample
+
+```javascript
+const resp = await fetch("/api/KJV/random/old-testament");
+const data = await resp.json();
+console.log(data);
+```
+
+#### Response Schema
+
+```javascript
+{
+  version: "KJV",
+  testament: "Old",
+  book: "Isaiah",
+  chapter: 41,
+  verse: 10,
+  text: "Fear thou not; for I am with thee: be not dismayed; for I am thy God..."
+}
+```
+
+[🔼 Back to Top](#table-of-contents)
+
+</details>
+
+<details>
+<summary>
+
+### `GET` Random New Testament Verse
+
+</summary>
+
+#### Endpoint
+
+```bash
+/api/[bible]/random/new-testament
+```
+
+#### Request Sample
+
+```javascript
+const resp = await fetch("/api/KJV/random/new-testament");
+const data = await resp.json();
+console.log(data);
+```
+
+#### Response Schema
+
+```javascript
+{
+  version: "KJV",
+  testament: "New",
+  book: "John",
+  chapter: 3,
+  verse: 16,
+  text: "For God so loved the world..."
+}
+```
+
+[🔼 Back to Top](#table-of-contents)
+
+</details>
+
+<details>
+<summary>
+
 ### `GET` Verse of the Day
 
 </summary>
