@@ -1,1327 +1,564 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Scripture API Documentation</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            amber: { 50: '#fffbeb', 100: '#fef3c7', 200: '#fde68a', 300: '#fcd34d', 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706', 700: '#b45309', 800: '#92400e', 900: '#78350f' },
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        }
+      }
+    }
+  </script>
   <style>
-    :root {
-      /* Elevated Golden Brown Dark Theme */
-      --bg-base: #0A0806;        /* Deeper black/brown */
-      --bg-card: rgba(28, 21, 18, 0.4); /* Glass card */
-      --bg-card-hover: rgba(36, 27, 23, 0.6);
-      --border-color: rgba(56, 42, 36, 0.5);
-      --border-highlight: rgba(212, 163, 115, 0.4);
-
-      --text-main: #FDFBF9;      /* Warmer, brighter white */
-      --text-muted: #BFAEA3;     /* Softer muted tone */
-
-      --accent-gold: #D4A373;    
-      --accent-gold-hover: #E6B585;
-      --accent-glow: rgba(212, 163, 115, 0.2);
-
-      --code-bg: rgba(15, 11, 9, 0.8);
-      --code-text: #EADCD0;
-      --method-get: #D4A373;
-
-      --font-ui: 'Inter', -apple-system, sans-serif;
-      --font-mono: 'JetBrains Mono', monospace;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: var(--font-ui);
-      background-color: var(--bg-base);
-      color: var(--text-main);
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-    }
-
-    /* Ambient glow */
-    .glow {
-      position: absolute;
-      top: -150px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 800px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(212, 163, 115, 0.15) 0%, rgba(10, 8, 6, 0) 70%);
-      z-index: -1;
-      pointer-events: none;
-      animation: pulseGlow 8s ease-in-out infinite alternate;
-    }
-
-    @keyframes pulseGlow {
-      0% { opacity: 0.8; transform: translateX(-50%) scale(0.95); }
-      100% { opacity: 1; transform: translateX(-50%) scale(1.05); }
-    }
-
-    /* Navigation */
-    nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1.25rem 5%;
-      border-bottom: 1px solid var(--border-color);
-      background: rgba(10, 8, 6, 0.7);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-weight: 700;
-      font-size: 1.25rem;
-      letter-spacing: -0.02em;
-    }
-
-    .brand-icon {
-      width: 28px;
-      height: 28px;
-      background: linear-gradient(135deg, var(--accent-gold), #8C6239);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 12px rgba(212, 163, 115, 0.2);
-    }
-
-    .container { max-width: 1000px; margin: 0 auto; padding: 0 2rem; position: relative; }
-
-    /* Hero */
-    .hero {
-      padding: 8rem 0 5rem;
-      text-align: left;
-      position: relative;
-    }
-
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: var(--accent-glow);
-      color: var(--accent-gold);
-      padding: 0.4rem 1rem;
-      border-radius: 99px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      margin-bottom: 2rem;
-      border: 1px solid rgba(212, 163, 115, 0.3);
-      backdrop-filter: blur(8px);
-    }
-
-    .hero-badge::before {
-      content: '';
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--accent-gold);
-      box-shadow: 0 0 12px var(--accent-gold);
-      animation: pulseDot 2s infinite;
-    }
-
-    @keyframes pulseDot {
-      0% { box-shadow: 0 0 0 0 rgba(212, 163, 115, 0.4); }
-      70% { box-shadow: 0 0 0 6px rgba(212, 163, 115, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(212, 163, 115, 0); }
-    }
-
-    .hero h1 {
-      font-size: clamp(3rem, 6vw, 4.5rem);
-      line-height: 1.05;
-      font-weight: 800;
-      letter-spacing: -0.04em;
-      margin-bottom: 1.5rem;
-      background: linear-gradient(180deg, #FFFFFF 0%, #D8C3B3 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .hero p {
-      font-size: 1.25rem;
-      color: var(--text-muted);
-      max-width: 600px;
-      margin-bottom: 3rem;
-      line-height: 1.7;
-    }
-
-    .btn-group { display: flex; gap: 1rem; flex-wrap: wrap; }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.875rem 2rem;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 600;
-      text-decoration: none;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      cursor: pointer;
-    }
-
-    .btn-primary {
-      background: var(--accent-gold);
-      color: var(--bg-base);
-      border: none;
-      box-shadow: 0 0 20px rgba(212, 163, 115, 0.2);
-    }
-    .btn-primary:hover {
-      background: var(--accent-gold-hover);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(212, 163, 115, 0.3);
-    }
-
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.03);
-      color: var(--text-main);
-      border: 1px solid var(--border-color);
-      backdrop-filter: blur(8px);
-    }
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.08);
-      border-color: var(--border-highlight);
-      transform: translateY(-2px);
-    }
-
-    /* Section Headers */
-    .section-header {
-      margin: 6rem 0 3rem;
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 1.5rem;
-    }
-    .section-header h2 {
-      font-size: 1.75rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    /* Cards */
-    .endpoint-card, .versions-wrapper {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      margin-bottom: 2.5rem;
-      overflow: hidden;
+    /* Custom CSS Enhancements */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    
+    .glass-card {
+      background: rgba(255, 255, 255, 0.85);
       backdrop-filter: blur(12px);
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    }
-    .endpoint-card:hover {
-      border-color: var(--border-highlight);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-    }
-
-    .endpoint-header {
-      padding: 1.25rem 1.75rem;
-      border-bottom: 1px solid var(--border-color);
-      background: rgba(0, 0, 0, 0.2);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    .endpoint-path {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      font-family: var(--font-mono);
-      font-size: 1rem;
-      color: var(--text-main);
-    }
-
-    .method {
-      background: var(--accent-glow);
-      color: var(--method-get);
-      padding: 0.35rem 0.75rem;
-      border-radius: 6px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      border: 1px solid rgba(212, 163, 115, 0.2);
-    }
-
-    .endpoint-desc {
-      padding: 1.75rem;
-      color: var(--text-muted);
-      border-bottom: 1px solid var(--border-color);
-      font-size: 1.05rem;
-    }
-
-    .code-block-wrapper {
-      position: relative;
-    }
-
-    .code-block {
-      background: var(--code-bg);
-      padding: 1.5rem 1.75rem;
-      font-family: var(--font-mono);
-      font-size: 0.9rem;
-      color: var(--code-text);
-      overflow-x: auto;
-      border-bottom: 1px solid var(--border-color);
-    }
-    .code-block:last-child { border-bottom: none; }
-
-    .copy-btn {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-color);
-      color: var(--text-muted);
-      padding: 0.4rem 0.8rem;
-      border-radius: 6px;
-      font-family: var(--font-ui);
-      font-size: 0.75rem;
-      font-weight: 500;
-      cursor: pointer;
-      opacity: 0;
-      transition: all 0.2s;
-      backdrop-filter: blur(4px);
-    }
-    .code-block-wrapper:hover .copy-btn { opacity: 1; }
-    .copy-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--text-main);
-      border-color: var(--border-highlight);
-    }
-    .copy-btn.copied {
-      background: rgba(46, 160, 67, 0.15);
-      color: #3FB950;
-      border-color: rgba(63, 185, 80, 0.4);
-    }
-
-    .versions-wrapper { padding: 2.5rem; margin-top: 4rem; }
-    .versions-wrapper h3 { font-size: 1.25rem; margin-bottom: 1rem; font-weight: 600; }
-    
-    .badge-container { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.5rem; }
-    .badge {
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid var(--border-color);
-      padding: 0.5rem 1.25rem;
-      border-radius: 8px;
-      font-family: var(--font-mono);
-      font-size: 0.875rem;
-      color: var(--accent-gold);
-      transition: all 0.2s;
-    }
-    .badge:hover { border-color: var(--accent-gold); background: var(--accent-glow); }
-
-    /* Footer */
-    footer {
-      text-align: center;
-      padding: 4rem 2rem;
-      border-top: 1px solid var(--border-color);
-      margin-top: 5rem;
-      color: var(--text-muted);
-      font-size: 0.875rem;
-    }
-
-    @media (max-width: 768px) {
-      .hero { padding: 5rem 0 3rem; }
-      .endpoint-header { flex-direction: column; align-items: flex-start; }
-      .copy-btn { opacity: 1; }
-    }
-    /* Try It Console */
-    .try-it-container {
-      padding: 1.5rem 1.75rem;
-      background: rgba(10, 8, 6, 0.4);
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      align-items: center;
+      -webkit-backdrop-filter: blur(12px);
     }
     
-    .try-input-group {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    
-    .try-input-group span {
-      color: var(--accent-gold);
-      font-family: var(--font-mono);
-      font-size: 0.85rem;
-    }
-
-    .try-input {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-color);
-      color: var(--text-main);
-      padding: 0.4rem 0.75rem;
-      border-radius: 6px;
-      font-family: var(--font-mono);
-      font-size: 0.85rem;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    
-    .try-input:focus {
-      border-color: var(--accent-gold);
-    }
-    
-    .try-btn {
-      background: rgba(212, 163, 115, 0.1);
-      color: var(--accent-gold);
-      border: 1px solid var(--accent-gold);
-      padding: 0.45rem 1rem;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 0.85rem;
-      transition: all 0.2s;
-      margin-left: auto;
-    }
-
-    .try-btn:hover {
-      background: var(--accent-gold);
-      color: var(--bg-base);
-    }
-
-    .try-btn.loading {
-      opacity: 0.7;
-      cursor: not-allowed;
-    }
-
-    /* Scroll Animations */
     .fade-in-up {
       opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: translateY(25px);
+      transition: opacity 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
-    
     .fade-in-up.visible {
       opacity: 1;
       transform: translateY(0);
     }
+    
+    .scale-hover {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .scale-hover:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.08), 0 10px 15px -6px rgba(0, 0, 0, 0.04);
+      border-color: #fcd34d;
+    }
+    
+    .accordion-content {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .accordion-content.open {
+      grid-template-rows: 1fr;
+    }
+    .accordion-inner {
+      overflow: hidden;
+    }
   </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 font-sans selection:bg-amber-200 selection:text-amber-900 overflow-x-hidden">
 
-  <nav>
-    <div class="brand">
-      <div class="brand-icon">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--bg-base)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path>
-        </svg>
+  <!-- Mobile Overlay -->
+  <div id="mobileOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-30 hidden opacity-0 transition-opacity"></div>
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-white/95 backdrop-blur-xl border-r border-slate-200 z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col shadow-2xl lg:shadow-none">
+    <div class="p-6 border-b border-slate-100 flex items-center justify-between shrink-0">
+      <div class="flex items-center gap-3 font-bold text-xl text-slate-900">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white shadow-lg shadow-amber-500/30">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+        </div>
+        Scripture API
+      </div>
+      <button id="closeSidebar" class="lg:hidden text-slate-400 hover:text-slate-700 transition-colors">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+    </div>
+    
+    <div class="p-4 border-b border-slate-100 shrink-0">
+      <div class="relative group">
+        <input type="text" id="searchInput" placeholder="Search endpoints..." class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all shadow-sm group-hover:border-amber-300">
+        <svg class="absolute left-3 top-3 w-4 h-4 text-slate-400 group-hover:text-amber-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+      </div>
+    </div>
+
+    <nav id="sidebarNav" class="flex-1 overflow-y-auto p-4 space-y-1.5">
+      <!-- Nav items injected via JS -->
+    </nav>
+    
+    <div class="p-4 border-t border-slate-100 text-xs text-slate-400 text-center shrink-0">
+      &copy; 2026 Scripture API
+    </div>
+  </aside>
+
+  <!-- Mobile Header -->
+  <header class="lg:hidden fixed top-0 w-full bg-white/90 backdrop-blur-md border-b border-slate-200 z-20 px-6 py-4 flex items-center justify-between shadow-sm">
+    <div class="flex items-center gap-2 font-bold text-lg text-slate-900">
+      <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white shadow-md">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
       </div>
       Scripture API
     </div>
-  </nav>
+    <button id="openSidebar" class="text-slate-600 hover:text-amber-600 transition-colors focus:outline-none">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+    </button>
+  </header>
 
-  <div class="container">
-    <div class="glow"></div>
+  <!-- Main Content -->
+  <main class="lg:ml-72 pt-28 lg:pt-16 px-6 md:px-12 max-w-5xl mx-auto pb-24 relative">
+    
+    <!-- Ambient Background Elements -->
+    <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-amber-300/10 rounded-full blur-3xl pointer-events-none -translate-y-1/3 translate-x-1/3"></div>
+    <div class="absolute bottom-1/2 left-0 w-[400px] h-[400px] bg-orange-300/5 rounded-full blur-3xl pointer-events-none -translate-x-1/2"></div>
 
-    <section class="hero">
-      <div class="hero-badge">v1.0 Live Now</div>
-      <h1>The high-performance,<br>developer-first <br>Bible data layer.</h1>
-      <p>Scripture API provides a globally distributed, low-latency REST API for accessing multi-translation biblical texts with millisecond precision. Built for modern apps.</p>
-
-      <div class="btn-group">
-        <a href="#endpoints" class="btn btn-primary">API Reference &rarr;</a>
-        <a href="#versions" class="btn btn-secondary">View Supported Versions</a>
+    <!-- Hero Section -->
+    <section class="mb-16 fade-in-up visible relative z-10">
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm text-sm font-medium text-slate-700 mb-6">
+        <span class="relative flex h-2.5 w-2.5">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" id="status-ping"></span>
+          <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500" id="status-dot"></span>
+        </span>
+        <span id="status-text">Checking system status...</span>
       </div>
-    </section>
 
-    <section id="versions" class="versions-wrapper">
-      <h3>Auto-Detected Translations</h3>
-      <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">
-        datasets available on the server. To query the API, replace <code>{bible}</code> in the endpoints with one of the identifiers below.
-      </p>
-      <div class="badge-container" id="versions-container">
-        <span class="badge" style="opacity: 0.5;">Scanning datasets...</span>
-      </div>
-    </section>
-
-   <div class="versions-wrapper">
-    <strong>Base URL:</strong> <span class="method" id="base-url"></span><br>
-   </div>
-
-
-    <div class="section-header" id="endpoints">
-      <h2>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="3"></circle>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-        </svg>
-        Core Endpoints
-      </h2>
-      <span>6 Methods Available</span>
-    </div>
-
-
-    <!-- Endpoint 0 -->
-    <div class="endpoint-card">
-  <div class="endpoint-header">
-    <div class="endpoint-path">
-      <span class="method">GET</span> /api/versions
-    </div>
-  </div>
-
-  <div class="endpoint-desc">
-    Lists all available Bible translation datasets loaded on the server.
-</div>
-
-  <div class="code-block">
-  <pre><code>
-  GET /api/versions
-  </code></pre>
-  </div>
-
-  <div class="code-block">
-  <pre><code class="json">
-  {
-  "versions":
-    [
-      "KJbible",
-      "NIVbible"
-    ]
-  }
-  </code></pre>
-  </div>
-  </div>
-
-  <!-- Endpoint 0.1 -->
-  <div class="endpoint-card">
-  <div class="endpoint-header">
-  <div class="endpoint-path">
-    <span class="method">GET</span> /api/metadata
-  </div>
-  </div>
-
-  <div class="endpoint-desc">
-   Returns system-level metadata and configuration for the API.
-</div>
-
-  <div class="code-block">
-  <pre><code>
-  GET /api/metadata
-  </code></pre>
-  </div>
-
-  <div class="code-block">
-  <pre><code class="json">
-
-  </code></pre>
-  </div>
-  </div>
-
-  <!-- Endpoint 0.2 -->
-  <div class="endpoint-card">
-  <div class="endpoint-header">
-  <div class="endpoint-path">
-    <span class="method">GET</span> /api/health
-  </div>
-  </div>
-
-  <div class="endpoint-desc">
-   Checks if the API engine is alive and reports system uptime.
-</div>
-
-  <div class="code-block">
-  <pre><code>
-  GET /api/health
-  </code></pre>
-  </div>
-
-  <div class="code-block">
-  <pre><code class="json">
-    {
-      "status": "ok",
-      "timestamp": "2026-04-01T15:45:12.345Z",
-      "bible_versions": ["KJbible", "NIVbible"],
-      "api_version": "1.0.0",
-      "database": "connected"
-    }
-  </code></pre>
-  </div>
-  </div>
-
-  <!-- Endpoint 0.3 -->
-  <div class="endpoint-card">
-  <div class="endpoint-header">
-  <div class="endpoint-path">
-    <span class="method">GET</span> /api/{bible}/summary
-  </div>
-  </div>
-
-  <div class="endpoint-desc">
-  Aggregates metadata for the entire specified Bible translation.
-</div>
-
-  <div class="code-block">
-  <pre><code>
-  GET /api/KJbible/books/summary
-  </code></pre>
-  </div>
-
-  <div class="code-block">
-  <pre><code class="json">
-    {
-    "books": [
-      {
-        "name": "Genesis",
-        "chapters": 50,
-        "verses": 1533,
-        "chapterSummary": [
-          { "chapter": 1, "verses": 31 },
-          { "chapter": 2, "verses": 25 },
-          { "chapter": 3, "verses": 24 }
-        ]
-      }
-    ]
-  }
-  </code></pre>
-  </div>
-  </div>
-
-  <!-- Endpoint 0.4 -->
-  <div class="endpoint-card">
-  <div class="endpoint-header">
-  <div class="endpoint-path">
-    <span class="method">GET</span> /api/{bible}/summary/{book}
-  </div>
-  </div>
-
-  <div class="endpoint-desc">
-   Returns total chapters and verse configurations for a specific book.
-</div>
-
-  <div class="code-block">
-  <pre><code>
-  GET /api/KJbible/summary/Genesis
-  </code></pre>
-  </div>
-
-  <div class="code-block">
-  <pre><code class="json">
-    {
-    "book": "Genesis",
-    "chapters": 50,
-    "totalVerses": 1533,
-    "chapterSummary": [
-      { "chapter": 1, "verses": 31 },
-      { "chapter": 2, "verses": 25 },
-      { "chapter": 3, "verses": 24 }
-    ]
-  }
-  </code></pre>
-  </div>
-  </div>
-
-  <!-- Endpoint 0.4 -->
-  <div class="endpoint-card">
-  <div class="endpoint-header">
-  <div class="endpoint-path">
-    <span class="method">GET</span> /api/{bible}/bookOrder
-  </div>
-  </div>
-
-  <div class="endpoint-desc">
-   Returns the chronological order of books for the specified translation.
-</div>
-  <div class="code-block">
-  <pre><code>
-  GET  /api/KJbible/bookOrder
-  </code></pre>
-  </div>
-
-  <div class="code-block">
-  <pre><code class="json">
-    {
-  "books": [
-    "Genesis",
-    "Exodus",
-    "Leviticus",
-    "Numbers",
-    "Deuteronomy",
-    "Joshua",
-     ....
-  </code></pre>
-  </div>
-  </div>
-
-
-
-
-  <!-- Endpoint 0.5 -->
-  <div class="endpoint-card">
-  <div class="endpoint-header">
-  <div class="endpoint-path">
-    <span class="method">GET</span> /api/{bible}/summary/{book}/{chapter}
-  </div>
-  </div>
-
-  <div class="endpoint-desc">
-   Provides verse count and metadata for a specific chapter.
-</div>
-
-  <div class="code-block">
-  <pre><code>
-  GET /api/KJbible/summary/Genesis/1
-  </code></pre>
-  </div>
-
-  <div class="code-block">
-  <pre><code class="json">
-    {
-    "book": "Genesis",
-    "chapter": 1,
-    "verses": 31
-  }
-  </code></pre>
-  </div>
-  </div>
-    <!-- Endpoint 1 -->
-    <div class="endpoint-card">
-  <div class="endpoint-header">
-    <div class="endpoint-path">
-      <span class="method">GET</span> /api/{bible}/book
-    </div>
-  </div>
-
-  <div class="endpoint-desc">
-    Fetches metadata and an overview of chapters for the specified book.
-</div>
-
-  <div class="code-block">
-<pre><code>
-GET /api/KJbible/book?name=Genesis
-</code></pre>
-  </div>
-
-  <div class="code-block">
-<pre><code class="json">
-{
-  "book": "Genesis",
-  "chapters": [1,2,3,4,5,6,"..."]
-}
-</code></pre>
-  </div>
-</div>
-
-    <!-- Endpoint 2 -->
-    <div class="endpoint-card">
-  <div class="endpoint-header">
-    <div class="endpoint-path">
-      <span class="method">GET</span> /api/{bible}/chapter
-    </div>
-  </div>
-
-  <div class="endpoint-desc">
-    Retrieves all verses within a specific chapter.
-</div>
-
-  <div class="code-block">
-<pre><code>
-GET /api/KJbible/chapter?book=Genesis&chapter=1
-</code></pre>
-  </div>
-
-  <div class="code-block">
-<pre><code class="json">
-{
-  "book": "Genesis",
-  "chapter": 1,
-  "verses": [
-    {
-      "verse": 1,
-      "text": "In the beginning God created the heaven and the earth."
-    },
-    {
-      "verse": 2,
-      "text": "And the earth was without form, and void..."
-    }
-  ]
-}
-</code></pre>
-  </div>
-</div>
-
-    <!-- Endpoint 3 -->
-    <div class="endpoint-card">
-  <div class="endpoint-header">
-    <div class="endpoint-path">
-      <span class="method">GET</span> /api/{bible}/verse
-    </div>
-  </div>
-
-  <div class="endpoint-desc">
-    Fetches the exact text of a specified verse.
-</div>
-
-  <div class="code-block">
-<pre><code>
-GET /api/KJbible/verse?book=Genesis&chapter=1&verse=1
-</code></pre>
-  </div>
-
-  <div class="code-block">
-<pre><code class="json">
-{
-  "book": "Genesis",
-  "chapter": 1,
-  "verse": 1,
-  "text": "In the beginning God created the heaven and the earth."
-}
-</code></pre>
-  </div>
-</div>
-
-    <!-- Endpoint 4 -->
-    <div class="endpoint-card">
-  <div class="endpoint-header">
-    <div class="endpoint-path">
-      <span class="method">GET</span> /api/{bible}/search?q={query}
-    </div>
-  </div>
-
-  <div class="endpoint-desc">
-    Executes a global text search across the specified translation.
-</div>
-
-  <div class="code-block">
-<pre><code>
-  GET /api/KJbible/search?q=faith
-  GET /api/NIVbible/search?q=hope
-  GET /api/KJbible/search?q=for god so loved
-</code></pre>
-  </div>
-
-  <div class="code-block">
-<pre><code class="json">
-{
-  "results": [
-    {
-      "book": "John",
-      "chapter": 3,
-      "verse": 16,
-      "text": "For God so loved the world, that he gave his only begotten Son..."
-    }
-  ]
-}
-</code></pre>
-  </div>
-</div>
-
-<!-- Endpoint 5 -->
-<div class="endpoint-card">
-<div class="endpoint-header">
-<div class="endpoint-path">
-  <span class="method">GET</span> /api/{bible}/topic/{keyword}
-</div>
-</div>
-
-<div class="endpoint-desc">
-Retrieves a curated list of verses relating to a specific topic or theme.
-</div>
-
-<div class="code-block">
-<pre><code>
-  GET /api/KJbible/topic/faith
-  GET /api/KJbible/topic/love
-  GET /api/NIVbible/topic/hope
-</code></pre>
-</div>
-
-<div class="code-block">
-<pre><code class="json">
-  {
-    "version": "KJbible",
-    "topic": "faith",
-    "count": 3,
-    "results": [
-      { "book": "Hebrews", "chapter": 11, "verse": 1, "text": "Now faith is the substance of things hoped for..." },
-      { "book": "Romans", "chapter": 10, "verse": 17, "text": "So then faith cometh by hearing, and hearing by the word of God." },
-      { "book": "Matthew", "chapter": 17, "verse": 20, "text": "If ye have faith as a grain of mustard seed..." }
-    ]
-  }
-</code></pre>
-</div>
-</div>
-
-    <!-- Endpoint 5 -->
-    <div class="endpoint-card">
-  <div class="endpoint-header">
-    <div class="endpoint-path">
-      <span class="method">GET</span> /api/{bible}/books
-    </div>
-  </div>
-
-  <div class="endpoint-desc">
-    Returns a simple list of all books available in the active translation.
-</div>
-
-  <div class="code-block">
-<pre><code>
-GET /api/KJbible/books
-</code></pre>
-  </div>
-
-  <div class="code-block">
-<pre><code class="json">
-{
-  "books": [
-    "Genesis",
-    "Exodus",
-    "Leviticus",
-    "Numbers",
-    "Deuteronomy",
-    "..."
-  ]
-}
-</code></pre>
-  </div>
-</div>
-
-    <!-- Endpoint 6 -->
-    <div class="endpoint-card">
-  <div class="endpoint-header">
-    <div class="endpoint-path">
-      <span class="method">GET</span> /api/{bible}/random
-    </div>
-  </div>
-
-  <div class="endpoint-desc">
-    Fetches a strictly random verse from the active translation.
-</div>
-
-  <div class="code-block">
-<pre><code>
-GET /api/KJbible/random
-</code></pre>
-  </div>
-
-  <div class="code-block">
-<pre><code class="json">
-{
-  "book": "Psalms",
-  "chapter": 23,
-  "verse": 1,
-  "text": "The LORD is my shepherd; I shall not want."
-}
-</code></pre>
-  </div>
-</div>
-
-<!-- Endpoint 6 -->
-<div class="endpoint-card">
-<div class="endpoint-header">
-<div class="endpoint-path">
-  <span class="method">GET</span> /api/{bible}/random/{book}
-</div>
-</div>
-
-<div class="endpoint-desc">
-Fetches a strictly random verse from the specified book.
-</div>
-
-<div class="code-block">
-<pre><code>
-GET /api/KJbible/random/Genesis
-</code></pre>
-</div>
-
-<div class="code-block">
-<pre><code class="json">
-  {
-    "version": "KJbible",
-    "book": "Genesis",
-    "chapter": 15,
-    "verse": 6,
-    "text": "And he believed in the LORD; and he counted it to him for righteousness."
-  }
-</code></pre>
-</div>
-</div>
-
-<!-- Endpoint 6 -->
-<div class="endpoint-card">
-<div class="endpoint-header">
-<div class="endpoint-path">
-  <span class="method">GET</span> /api/{bible}/random/old-testament
-</div>
-</div>
-
-<div class="endpoint-desc">
-Fetches a random verse exclusively from the Old Testament (39 books).
-</div>
-
-<div class="code-block">
-<pre><code>
-GET  /api/KJbible/random/old-testament
-</code></pre>
-</div>
-
-<div class="code-block">
-<pre><code class="json">
-  {
-    "version": "KJbible",
-    "testament": "Old",
-    "book": "Isaiah",
-    "chapter": 41,
-    "verse": 10,
-    "text": "Fear thou not; for I am with thee: be not dismayed; for I am thy God..."
-  }
-</code></pre>
-</div>
-</div>
-
-<!-- Endpoint 6 -->
-<div class="endpoint-card">
-<div class="endpoint-header">
-<div class="endpoint-path">
-  <span class="method">GET</span> /api/{bible}/random/new-testament
-</div>
-</div>
-
-<div class="endpoint-desc">
-Fetches a random verse exclusively from the New Testament (27 books).
-</div>
-
-<div class="code-block">
-<pre><code>
-GET  /api/KJbible/random/new-testament
-</code></pre>
-</div>
-
-<div class="code-block">
-<pre><code class="json">
-  {
-    "version": "KJbible",
-    "testament": "New",
-    "book": "John",
-    "chapter": 3,
-    "verse": 16,
-    "text": "For God so loved the world..."
-  }
-</code></pre>
-</div>
-</div>
-
-<!-- Endpoint 7 -->
-<div class="endpoint-card">
-<div class="endpoint-header">
-<div class="endpoint-path">
-  <span class="method">GET</span> /api/{bible}/passage?book={book}&chapter={chapter}&start={start}&end={end}
-</div>
-</div>
-
-<div class="endpoint-desc">
-Retrieves a contiguous block of verses across a chapter.
-</div>
-
-<div class="code-block">
-<pre><code>
-/api/KJbible/passage?book=John&chapter=3&start=16&end=18
-</code></pre>
-</div>
-
-<div class="code-block">
-<pre><code class="json">
-{
-"book": "Psalms",
-"chapter": 23,
-"verse": 1,
-"text": "The LORD is my shepherd; I shall not want."
-}
-</code></pre>
-</div>
-</div>
-
-<!-- Endpoint 8 -->
-<div class="endpoint-card">
-<div class="endpoint-header">
-<div class="endpoint-path">
-  <span class="method">GET</span> /app/api/[bible]/ref/[reference]
-</div>
-</div>
-
-<div class="endpoint-desc">
-Parses human-readable strings (e.g., "John 3:16") into verse text.
-</div>
-
-<div class="code-block">
-<pre><code>
-Single verse: GET /api/KJbible/ref/John 3:16
-Verse range (same chapter): GET /api/KJbible/ref/John 3:16-18
-Multi-chapter range: GET /api/KJbible/ref/Genesis 1:31-2:3
-</code></pre>
-</div>
-
-<div class="code-block">
-<pre><code class="json">
-  {
-    "version": "KJbible",
-    "book": "Genesis",
-    "start": { "chapter": 1, "verse": 31 },
-    "end": { "chapter": 2, "verse": 3 },
-    "verseCount": 4,
-    "verses": [
-      { "chapter": 1, "verse": 31, "text": "And God saw everything that he had made..." },
-      { "chapter": 2, "verse": 1, "text": "Thus the heavens and the earth were finished..." },
-      { "chapter": 2, "verse": 2, "text": "And on the seventh day God ended his work..." },
-      { "chapter": 2, "verse": 3, "text": "And God blessed the seventh day..." }
-    ]
-  }
-</code></pre>
-</div>
-</div>
-
-<!-- Endpoint 9 -->
-<div class="endpoint-card">
-<div class="endpoint-header">
-<div class="endpoint-path">
-  <span class="method">GET</span> /api/{bible}/daily
-</div>
-</div>
-
-<div class="endpoint-desc">
-Return one fixed verse per day.Every request that day returns the same verse
-Returns the Verse of the Day for the specified Bible translation. This is a pre-determined verse based on the current date and can be used for daily devotionals or app notifications.
-</div>
-
-
-<div class="code-block">
-<pre><code>
-/api/KJbible/daily
-</code></pre>
-</div>
-
-<div class="code-block">
-<pre><code class="json">
-  {
-   "date": "2026-04-01",
-   "book": "Proverbs",
-   "chapter": 3,
-   "verse": 5,
-   "text": "Trust in the LORD with all thine heart..."
-  }
-</code></pre>
-</div>
-</div>
-
-
-  </div>
-
-  <footer>
-    <div style="display: flex; justify-content: center; gap: 2rem; margin-bottom: 1.5rem;">
-      <a href="#" style="color: var(--text-muted); text-decoration: none;">Terms</a>
-      <a href="#" style="color: var(--text-muted); text-decoration: none;">Privacy</a>
-      <a href="#" style="color: var(--text-muted); text-decoration: none;">Status</a>
-      <a href="#" style="color: var(--text-muted); text-decoration: none;">Support</a>
-    </div>
-    &copy; 2026 Scripture API. Built for modern apps.
-  </footer>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      const biblVersionsContainer = document.getElementById('versions-container');
-      try {
-        const response = await fetch('/api/versions');
-        if (!response.ok) throw new Error('Failed to fetch');
-
-        const data = await response.json();
-
-        if (data.versions && data.versions.length > 0) {
-          biblVersionsContainer.innerHTML = ''; // Clear loading state
-
-          data.versions.forEach(version => {
-            const span = document.createElement('span');
-            span.className = 'badge';
-
-            // Icon
-            span.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>`;
-
-            // Text
-            const textNode = document.createTextNode(` ${version}`);
-            span.appendChild(textNode);
-
-            biblVersionsContainer.appendChild(span);
-          });
-        } else {
-          biblVersionsContainer.innerHTML = '<span class="badge" style="opacity: 0.5;">No versions found</span>';
-        }
-      } catch (error) {
-        biblVersionsContainer.innerHTML = '<span class="badge" style="color: #ef4444; border-color: #ef4444;">Error loading versions</span>';
-      }
-
-      const BaseURLcontainer = document.getElementById('base-url');
-      var origin = window.location && window.location.origin ? window.location.origin : "/";
-      BaseURLcontainer.textContent = origin;
-
-    });
-  </script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-tight mb-6">
+        The high-performance,<br>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-500">developer-first</span> Bible data layer.
+      </h1>
       
-      // 1. Scroll Animations
+      <p class="text-lg text-slate-600 max-w-2xl leading-relaxed mb-10">
+        Scripture API provides a globally distributed, low-latency REST API for accessing multi-translation biblical texts with millisecond precision. Built for modern applications.
+      </p>
+
+      <div class="flex flex-wrap items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200 inline-block">
+        <span class="text-sm font-bold text-slate-400 uppercase tracking-wider">Base URL</span>
+        <code class="px-3 py-1.5 bg-slate-50 text-slate-800 rounded-lg font-mono text-sm border border-slate-200 shadow-inner" id="baseUrlDisplay"></code>
+        <button class="text-amber-600 hover:text-white hover:bg-amber-500 transition-all bg-amber-50 px-4 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-1.5" onclick="copyBaseUrl()">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+          Copy
+        </button>
+      </div>
+    </section>
+
+    <!-- Content Sections -->
+    <div id="sectionsContainer" class="space-y-8 relative z-10">
+      <!-- Injected via JS -->
+    </div>
+
+  </main>
+
+  <!-- Interactive Modal Overlay -->
+  <div id="endpointModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity opacity-0 modal-backdrop" onclick="closeModal()"></div>
+    <div class="fixed inset-0 overflow-y-auto pointer-events-none">
+      <div class="flex min-h-full items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl transform scale-95 opacity-0 transition-all duration-300 modal-panel flex flex-col max-h-[90vh] pointer-events-auto">
+          
+          <!-- Modal Header -->
+          <div class="p-6 md:p-8 border-b border-slate-100 flex items-start justify-between bg-slate-50/80 rounded-t-2xl shrink-0">
+            <div>
+              <div class="flex items-center gap-3 mb-3">
+                <span id="modalMethod" class="px-2.5 py-1 text-xs font-bold tracking-wider rounded-md border bg-blue-100 text-blue-700 border-blue-200 shadow-sm">GET</span>
+                <code id="modalPath" class="font-mono text-lg md:text-xl text-slate-800 font-bold">/api/path</code>
+              </div>
+              <p id="modalDesc" class="text-slate-600 text-sm md:text-base"></p>
+            </div>
+            <button onclick="closeModal()" class="text-slate-400 hover:text-slate-700 bg-white p-2 rounded-full shadow-sm border border-slate-200 transition-colors">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+          </div>
+
+          <!-- Modal Body -->
+          <div class="p-6 md:p-8 overflow-y-auto bg-white">
+            
+            <div class="flex items-center justify-between mb-5">
+              <h4 class="font-bold text-slate-800 text-lg flex items-center gap-2">
+                <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Test this endpoint
+              </h4>
+            </div>
+
+            <div id="modalInputs" class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6 bg-slate-50 p-5 rounded-xl border border-slate-100">
+              <!-- Inputs injected -->
+            </div>
+
+            <button id="testApiBtn" class="w-full py-3.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 active:scale-[0.99] active:shadow-sm">
+              <svg id="testSpinner" class="w-5 h-5 animate-spin hidden" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span>Execute Request</span>
+            </button>
+
+            <div class="mt-10">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="font-bold text-slate-800 text-lg flex items-center gap-2">
+                  <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                  Response
+                </h4>
+                <div class="flex items-center gap-3">
+                  <span id="responseStatus" class="text-xs font-bold px-2.5 py-1 rounded-md hidden shadow-sm border"></span>
+                  <button onclick="copyResponse()" class="text-sm font-semibold text-slate-500 hover:text-amber-600 flex items-center gap-1.5 transition-colors bg-slate-100 hover:bg-amber-50 px-3 py-1.5 rounded-lg">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                    Copy JSON
+                  </button>
+                </div>
+              </div>
+              <div class="bg-slate-900 rounded-xl overflow-hidden shadow-inner border border-slate-800 relative">
+                <div class="flex gap-1.5 px-4 py-3 bg-slate-800 border-b border-slate-700">
+                  <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                  <div class="w-3 h-3 rounded-full bg-amber-500"></div>
+                  <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                </div>
+                <pre class="p-5 overflow-x-auto text-sm font-mono text-amber-50 max-h-[400px] leading-relaxed"><code id="modalResponse"></code></pre>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white px-5 py-3.5 rounded-xl shadow-2xl transform translate-y-24 opacity-0 transition-all duration-300 z-[100] flex items-center gap-3 font-medium border border-slate-700">
+    <div class="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center">
+      <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+    </div>
+    <span id="toastMsg">Action successful</span>
+  </div>
+
+  <!-- Interactive Logic -->
+  <script>
+    const endpoints = [
+      { id: 'versions', category: 'System & Metadata', method: 'GET', path: '/api/versions', description: 'Lists all available Bible translation datasets loaded on the server.', response: '{\n  "versions": [\n    "KJbible",\n    "NIVbible"\n  ]\n}', params: {} },
+      { id: 'metadata', category: 'System & Metadata', method: 'GET', path: '/api/metadata', description: 'Returns system-level metadata and configuration for the API.', response: '{}', params: {} },
+      { id: 'health', category: 'System & Metadata', method: 'GET', path: '/api/health', description: 'Checks if the API engine is alive and reports system uptime.', response: '{\n  "status": "ok",\n  "timestamp": "2026-04-01T15:45:12.345Z",\n  "bible_versions": ["KJbible", "NIVbible"],\n  "api_version": "1.0.0",\n  "database": "connected"\n}', params: {} },
+      
+      { id: 'summary', category: 'Summaries & Structure', method: 'GET', path: '/api/{bible}/summary', description: 'Aggregates metadata for the entire specified Bible translation.', response: '{\n  "books": [\n    {\n      "name": "Genesis",\n      "chapters": 50,\n      "verses": 1533,\n      "chapterSummary": [\n        { "chapter": 1, "verses": 31 }\n      ]\n    }\n  ]\n}', params: { bible: 'KJbible' } },
+      { id: 'summary-book', category: 'Summaries & Structure', method: 'GET', path: '/api/{bible}/summary/{book}', description: 'Returns total chapters and verse configurations for a specific book.', response: '{\n  "book": "Genesis",\n  "chapters": 50,\n  "totalVerses": 1533\n}', params: { bible: 'KJbible', book: 'Genesis' } },
+      { id: 'book-order', category: 'Summaries & Structure', method: 'GET', path: '/api/{bible}/bookOrder', description: 'Returns the chronological order of books for the specified translation.', response: '{\n  "books": ["Genesis", "Exodus", "Leviticus"]\n}', params: { bible: 'KJbible' } },
+      { id: 'summary-chapter', category: 'Summaries & Structure', method: 'GET', path: '/api/{bible}/summary/{book}/{chapter}', description: 'Provides verse count and metadata for a specific chapter.', response: '{\n  "book": "Genesis",\n  "chapter": 1,\n  "verses": 31\n}', params: { bible: 'KJbible', book: 'Genesis', chapter: '1' } },
+      
+      { id: 'book', category: 'Core Content', method: 'GET', path: '/api/{bible}/book', description: 'Fetches metadata and an overview of chapters for the specified book.', response: '{\n  "book": "Genesis",\n  "chapters": [1,2,3,4,5]\n}', params: { bible: 'KJbible', name: 'Genesis' } },
+      { id: 'chapter', category: 'Core Content', method: 'GET', path: '/api/{bible}/chapter', description: 'Retrieves all verses within a specific chapter.', response: '{\n  "book": "Genesis",\n  "chapter": 1,\n  "verses": [\n    { "verse": 1, "text": "In the beginning God created the heaven and the earth." }\n  ]\n}', params: { bible: 'KJbible', book: 'Genesis', chapter: '1' } },
+      { id: 'verse', category: 'Core Content', method: 'GET', path: '/api/{bible}/verse', description: 'Fetches the exact text of a specified verse.', response: '{\n  "book": "Genesis",\n  "chapter": 1,\n  "verse": 1,\n  "text": "In the beginning God created the heaven and the earth."\n}', params: { bible: 'KJbible', book: 'Genesis', chapter: '1', verse: '1' } },
+      { id: 'passage', category: 'Core Content', method: 'GET', path: '/api/{bible}/passage', description: 'Retrieves a contiguous block of verses across a chapter.', response: '{\n  "book": "John",\n  "chapter": 3,\n  "verses": [\n    { "verse": 16, "text": "For God so loved the world..." }\n  ]\n}', params: { bible: 'KJbible', book: 'John', chapter: '3', start: '16', end: '18' } },
+      { id: 'ref', category: 'Core Content', method: 'GET', path: '/api/{bible}/ref/{reference}', description: 'Parses human-readable strings (e.g., "John 3:16") into verse text.', response: '{\n  "version": "KJbible",\n  "start": { "chapter": 3, "verse": 16 },\n  "verses": []\n}', params: { bible: 'KJbible', reference: 'John 3:16' } },
+      
+      { id: 'search', category: 'Search & Discovery', method: 'GET', path: '/api/{bible}/search', description: 'Executes a global text search across the specified translation.', response: '{\n  "results": [\n    {\n      "book": "John",\n      "chapter": 3,\n      "verse": 16,\n      "text": "For God so loved the world..."\n    }\n  ]\n}', params: { bible: 'KJbible', q: 'faith' } },
+      { id: 'topic', category: 'Search & Discovery', method: 'GET', path: '/api/{bible}/topic/{keyword}', description: 'Retrieves a curated list of verses relating to a specific topic or theme.', response: '{\n  "topic": "faith",\n  "count": 3,\n  "results": []\n}', params: { bible: 'KJbible', keyword: 'faith' } },
+      
+      { id: 'books-list', category: 'Random & Daily', method: 'GET', path: '/api/{bible}/books', description: 'Returns a simple list of all books available in the active translation.', response: '{\n  "books": ["Genesis", "Exodus"]\n}', params: { bible: 'KJbible' } },
+      { id: 'random', category: 'Random & Daily', method: 'GET', path: '/api/{bible}/random', description: 'Fetches a strictly random verse from the active translation.', response: '{\n  "book": "Psalms",\n  "chapter": 23,\n  "verse": 1,\n  "text": "The LORD is my shepherd..."\n}', params: { bible: 'KJbible' } },
+      { id: 'random-book', category: 'Random & Daily', method: 'GET', path: '/api/{bible}/random/{book}', description: 'Fetches a strictly random verse from the specified book.', response: '{\n  "book": "Genesis",\n  "chapter": 15,\n  "verse": 6,\n  "text": "And he believed in the LORD..."\n}', params: { bible: 'KJbible', book: 'Genesis' } },
+      { id: 'random-ot', category: 'Random & Daily', method: 'GET', path: '/api/{bible}/random/old-testament', description: 'Fetches a random verse exclusively from the Old Testament.', response: '{\n  "testament": "Old",\n  "text": "Fear thou not..."\n}', params: { bible: 'KJbible' } },
+      { id: 'random-nt', category: 'Random & Daily', method: 'GET', path: '/api/{bible}/random/new-testament', description: 'Fetches a random verse exclusively from the New Testament.', response: '{\n  "testament": "New",\n  "text": "For God so loved the world..."\n}', params: { bible: 'KJbible' } },
+      { id: 'daily', category: 'Random & Daily', method: 'GET', path: '/api/{bible}/daily', description: 'Returns the Verse of the Day for the specified Bible translation.', response: '{\n  "date": "2026-04-01",\n  "book": "Proverbs",\n  "text": "Trust in the LORD..."\n}', params: { bible: 'KJbible' } }
+    ];
+
+    let currentModalEndpoint = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initApp();
+      checkHealth();
+    });
+
+    function initApp() {
+      // Set Base URL dynamically based on host
+      const origin = window.location.origin || 'http://localhost:3000';
+      document.getElementById('baseUrlDisplay').innerText = origin;
+
+      const categories = [...new Set(endpoints.map(e => e.category))];
+      const sectionsContainer = document.getElementById('sectionsContainer');
+      const sidebarNav = document.getElementById('sidebarNav');
+
+      categories.forEach((cat, index) => {
+        const catId = cat.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+        
+        // Render Sidebar Navigation Links
+        const navLink = document.createElement('a');
+        navLink.href = '#' + catId;
+        navLink.className = 'block px-4 py-2.5 text-sm text-slate-600 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors font-medium';
+        navLink.innerHTML = `<span class="flex items-center justify-between">${cat}</span>`;
+        navLink.onclick = () => { if(window.innerWidth < 1024) toggleSidebar(); };
+        sidebarNav.appendChild(navLink);
+
+        // Render Section Accordion and Endpoints
+        const catEndpoints = endpoints.filter(e => e.category === cat);
+        const sectionHtml = `
+          <div id="${catId}" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden fade-in-up scroll-mt-24">
+            <button class="w-full px-6 md:px-8 py-5 flex items-center justify-between bg-white hover:bg-slate-50 transition-colors" onclick="toggleAccordion('content-${index}', 'icon-${index}')">
+              <h2 class="text-xl font-extrabold text-slate-800 flex items-center gap-4">
+                ${cat}
+                <span class="text-xs font-bold bg-amber-100 text-amber-700 px-2.5 py-1 rounded-md shadow-sm">${catEndpoints.length}</span>
+              </h2>
+              <div class="bg-slate-100 p-1.5 rounded-lg">
+                 <svg id="icon-${index}" class="w-5 h-5 text-slate-500 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+              </div>
+            </button>
+            <div id="content-${index}" class="accordion-content open">
+              <div class="accordion-inner px-6 md:px-8 pb-8 pt-2 grid gap-5">
+                ${catEndpoints.map(e => `
+                  <div class="endpoint-card scale-hover glass-card rounded-xl p-5 md:p-6 cursor-pointer border border-slate-200 group" data-text="${e.path.toLowerCase()} ${e.description.toLowerCase()}" onclick="openModal('${e.id}')">
+                    <div class="flex items-center justify-between mb-4">
+                      <div class="flex items-center gap-3 flex-wrap">
+                        <span class="px-2.5 py-1 text-[11px] uppercase font-bold tracking-widest rounded-md border bg-blue-100 text-blue-700 border-blue-200 shadow-sm">${e.method}</span>
+                        <code class="font-mono text-slate-800 text-sm md:text-base font-bold">${e.path}</code>
+                      </div>
+                      <span class="text-slate-300 group-hover:text-amber-500 transition-colors bg-white rounded-full p-1.5 border border-transparent group-hover:border-amber-200 shadow-sm opacity-0 group-hover:opacity-100">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                      </span>
+                    </div>
+                    <p class="text-slate-500 text-sm leading-relaxed">${e.description}</p>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+        sectionsContainer.insertAdjacentHTML('beforeend', sectionHtml);
+      });
+
+      // Intersection Observer for Scroll Triggered Fade-ins
       const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
+        entries.forEach((entry, i) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
+            setTimeout(() => {
+               entry.target.classList.add('visible');
+            }, i * 100); // Stagger
             observer.unobserve(entry.target);
           }
         });
-      }, { threshold: 0.1 });
+      }, { threshold: 0.05 });
 
-      document.querySelectorAll('.endpoint-card, .section-header, .versions-wrapper').forEach(el => {
-        el.classList.add('fade-in-up');
-        observer.observe(el);
-      });
+      document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
 
-      // 2. Interactive "Try It" Parsing & Copy Buttons
-      document.querySelectorAll('.endpoint-card').forEach(card => {
-        
-        // Setup Copy Buttons
-        card.querySelectorAll('.code-block').forEach(block => {
-          const wrapper = document.createElement('div');
-          wrapper.className = 'code-block-wrapper';
-          block.parentNode.insertBefore(wrapper, block);
-          wrapper.appendChild(block);
-
-          const btn = document.createElement('button');
-          btn.className = 'copy-btn';
-          btn.innerText = 'Copy';
-          
-          btn.addEventListener('click', () => {
-            const text = block.innerText.trim();
-            navigator.clipboard.writeText(text).then(() => {
-              btn.innerText = 'Copied!';
-              btn.classList.add('copied');
-              setTimeout(() => {
-                btn.innerText = 'Copy';
-                btn.classList.remove('copied');
-              }, 2000);
-            });
-          });
-          wrapper.appendChild(btn);
-        });
-
-        // Setup "Try It" UI
-        const pathEl = card.querySelector('.endpoint-path');
-        if (!pathEl) return;
-        
-        let pathText = pathEl.innerText.replace('GET', '').replace('GET', '').trim();
-        const paramMatches = [...pathText.matchAll(/\{([^}]+)\}/g)];
-        
-        // If there are parameters to fill, or it's a static path we can still test
-        const responseBlocks = card.querySelectorAll('.code-block');
-        const jsonBlock = responseBlocks.length > 1 ? responseBlocks[1] : null;
-        
-        if (jsonBlock) {
-          const tryItContainer = document.createElement('div');
-          tryItContainer.className = 'try-it-container';
-          
-          let defaultInputs = {
-            'bible': 'KJbible',
-            'book': 'Genesis',
-            'chapter': '1',
-            'verse': '1',
-            'keyword': 'faith',
-            'query': 'hope',
-            'reference': 'John 3:16',
-            'start': '1',
-            'end': '3'
-          };
-
-          const inputs = {};
-
-          paramMatches.forEach(match => {
-            const paramName = match[1];
-            const group = document.createElement('div');
-            group.className = 'try-input-group';
-            
-            const label = document.createElement('span');
-            label.innerText = `{${paramName}}`;
-            
-            const input = document.createElement('input');
-            input.className = 'try-input';
-            input.type = 'text';
-            input.placeholder = paramName;
-            input.value = defaultInputs[paramName] || '';
-            
-            inputs[paramName] = input;
-            
-            group.appendChild(label);
-            group.appendChild(input);
-            tryItContainer.appendChild(group);
-          });
-
-          const testBtn = document.createElement('button');
-          testBtn.className = 'try-btn';
-          testBtn.innerText = 'Test API';
-          tryItContainer.appendChild(testBtn);
-
-          // Insert below description, before code blocks
-          const desc = card.querySelector('.endpoint-desc');
-          if (desc) {
-            desc.parentNode.insertBefore(tryItContainer, desc.nextSibling);
+      // Live Search/Filter Bar
+      document.getElementById('searchInput').addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        document.querySelectorAll('.endpoint-card').forEach(card => {
+          if(card.dataset.text.includes(query)) {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
           }
-
-          testBtn.addEventListener('click', async () => {
-            testBtn.classList.add('loading');
-            testBtn.innerText = 'Fetching...';
-
-            let finalUrl = pathText;
-            Object.keys(inputs).forEach(key => {
-              finalUrl = finalUrl.replace(`{${key}}`, encodeURIComponent(inputs[key].value));
-            });
-
-            // Strip out duplicated ? if they hardcoded query params like ?book={book}
-            try {
-              let fetchUrl = finalUrl;
-              // Clean up GET just in case
-              fetchUrl = fetchUrl.replace(/^GET\s*/g, '');
-              
-              const res = await fetch(fetchUrl);
-              const data = await res.json();
-              
-              // Find the inner code tag
-              const codeElem = jsonBlock.querySelector('code');
-              if (codeElem) {
-                codeElem.innerText = JSON.stringify(data, null, 2);
-              }
-              
-              testBtn.innerText = 'Success!';
-              setTimeout(() => { testBtn.innerText = 'Test API'; }, 2000);
-            } catch (err) {
-              const codeElem = jsonBlock.querySelector('code');
-              if (codeElem) {
-                codeElem.innerText = JSON.stringify({ error: err.message }, null, 2);
-              }
-              testBtn.innerText = 'Failed';
-              setTimeout(() => { testBtn.innerText = 'Test API'; }, 2000);
-            } finally {
-              testBtn.classList.remove('loading');
-            }
-          });
-        }
+        });
       });
+
+      // Mobile Menu Bindings
+      document.getElementById('openSidebar').onclick = toggleSidebar;
+      document.getElementById('closeSidebar').onclick = toggleSidebar;
+    }
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('mobileOverlay');
+      const isOpen = !sidebar.classList.contains('-translate-x-full');
+      
+      if(isOpen) {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('opacity-0');
+        setTimeout(() => overlay.classList.add('hidden'), 300);
+      } else {
+        overlay.classList.remove('hidden');
+        setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+        sidebar.classList.remove('-translate-x-full');
+      }
+    }
+
+    function toggleAccordion(contentId, iconId) {
+      const content = document.getElementById(contentId);
+      const icon = document.getElementById(iconId);
+      content.classList.toggle('open');
+      if(content.classList.contains('open')) {
+        icon.classList.remove('-rotate-90');
+      } else {
+        icon.classList.add('-rotate-90');
+      }
+    }
+
+    function openModal(id) {
+      const endpoint = endpoints.find(e => e.id === id);
+      currentModalEndpoint = endpoint;
+      
+      document.getElementById('modalPath').innerText = endpoint.path;
+      document.getElementById('modalDesc').innerText = endpoint.description;
+      document.getElementById('modalResponse').innerText = endpoint.response;
+      document.getElementById('responseStatus').classList.add('hidden');
+      
+      // Dynamically Build Input Forms for Parameters
+      const inputsContainer = document.getElementById('modalInputs');
+      inputsContainer.innerHTML = '';
+      
+      const allParamsKeys = Object.keys(endpoint.params);
+      if(allParamsKeys.length > 0) {
+         allParamsKeys.forEach(paramName => {
+            const val = endpoint.params[paramName];
+            // Check if param is part of path
+            const isPath = endpoint.path.includes('{' + paramName + '}');
+            const labelStr = isPath ? '{' + paramName + '}' : '?' + paramName + '=';
+            
+            inputsContainer.innerHTML += `
+              <div class="space-y-1.5">
+                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">\${labelStr}</label>
+                <input type="text" id="input-\${paramName}" value="\${val}" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors shadow-sm" placeholder="\${paramName}">
+              </div>
+            `;
+         });
+      } else {
+         inputsContainer.innerHTML = '<div class="text-sm font-medium text-slate-400 italic col-span-1 sm:col-span-2 py-2">No parameters required for this request.</div>';
+      }
+
+      // Show the Modal with transition
+      const modal = document.getElementById('endpointModal');
+      const backdrop = modal.querySelector('.modal-backdrop');
+      const panel = modal.querySelector('.modal-panel');
+      
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        backdrop.classList.remove('opacity-0');
+        panel.classList.remove('opacity-0', 'scale-95');
+      }, 10);
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('endpointModal');
+      const backdrop = modal.querySelector('.modal-backdrop');
+      const panel = modal.querySelector('.modal-panel');
+      
+      backdrop.classList.add('opacity-0');
+      panel.classList.add('opacity-0', 'scale-95');
+      
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 300);
+    }
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', (e) => {
+      if(e.key === 'Escape' && !document.getElementById('endpointModal').classList.contains('hidden')) {
+        closeModal();
+      }
     });
+
+    // Make Real API Request
+    document.getElementById('testApiBtn').addEventListener('click', async () => {
+      if(!currentModalEndpoint) return;
+      
+      const btn = document.getElementById('testApiBtn');
+      const spinner = document.getElementById('testSpinner');
+      const statusBadge = document.getElementById('responseStatus');
+      const responseCode = document.getElementById('modalResponse');
+      
+      btn.disabled = true;
+      spinner.classList.remove('hidden');
+      
+      let finalPath = currentModalEndpoint.path;
+      const queryParams = [];
+      
+      Object.keys(currentModalEndpoint.params).forEach(key => {
+         const val = document.getElementById('input-' + key).value;
+         if(finalPath.includes('{' + key + '}')) {
+            finalPath = finalPath.replace('{' + key + '}', encodeURIComponent(val));
+         } else {
+            queryParams.push(key + '=' + encodeURIComponent(val));
+         }
+      });
+      
+      if(queryParams.length > 0) {
+        finalPath += '?' + queryParams.join('&');
+      }
+
+      try {
+        const start = performance.now();
+        const res = await fetch(finalPath);
+        const time = Math.round(performance.now() - start);
+        
+        statusBadge.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'border-red-200');
+        statusBadge.classList.add('bg-green-100', 'text-green-700', 'border-green-200');
+        statusBadge.innerText = `HTTP \${res.status} • \${time}ms`;
+        
+        if(!res.ok) {
+           statusBadge.classList.replace('bg-green-100', 'bg-red-100');
+           statusBadge.classList.replace('text-green-700', 'text-red-700');
+           statusBadge.classList.replace('border-green-200', 'border-red-200');
+        }
+
+        // Try parsing JSON
+        const textData = await res.text();
+        try {
+           const jsonData = JSON.parse(textData);
+           responseCode.innerText = JSON.stringify(jsonData, null, 2);
+        } catch(e) {
+           responseCode.innerText = textData || "No response body";
+        }
+      } catch (err) {
+        statusBadge.classList.remove('hidden');
+        statusBadge.classList.add('bg-red-100', 'text-red-700', 'border-red-200');
+        statusBadge.innerText = 'Network Error';
+        responseCode.innerText = JSON.stringify({ error: err.message }, null, 2);
+      } finally {
+        btn.disabled = false;
+        spinner.classList.add('hidden');
+      }
+    });
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').innerText = msg;
+      toast.classList.remove('translate-y-24', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-24', 'opacity-0');
+      }, 3500);
+    }
+
+    function copyBaseUrl() {
+      const url = document.getElementById('baseUrlDisplay').innerText;
+      navigator.clipboard.writeText(url);
+      showToast('Base URL copied to clipboard');
+    }
+
+    function copyResponse() {
+      const code = document.getElementById('modalResponse').innerText;
+      navigator.clipboard.writeText(code);
+      showToast('Response payload copied to clipboard');
+    }
+
+    // Live API Health Check Status
+    async function checkHealth() {
+      const dot = document.getElementById('status-dot');
+      const ping = document.getElementById('status-ping');
+      const text = document.getElementById('status-text');
+      
+      try {
+        const res = await fetch('/api/health');
+        if(res.ok) {
+          text.innerText = 'API Systems Online';
+          dot.classList.replace('bg-amber-500', 'bg-green-500');
+          ping.classList.replace('bg-amber-400', 'bg-green-400');
+        } else {
+          throw new Error();
+        }
+      } catch(e) {
+        text.innerText = 'API Offline';
+        dot.classList.replace('bg-amber-500', 'bg-red-500');
+        ping.classList.replace('bg-amber-400', 'bg-red-400');
+        ping.classList.remove('animate-ping');
+      }
+    }
   </script>
 </body>
 </html>
