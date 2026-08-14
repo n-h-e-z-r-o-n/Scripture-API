@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { corsHeaders, getBibleData, toNum } from '@/lib/bibleUtils';
+import { NextRequest } from 'next/server';
+import { findBook, getBibleData, getBibleVersionInfo, toNum } from '@/lib/bibleUtils';
+import { errorResponse, jsonResponse, optionsResponse } from '@/lib/api';
 
 // Example: A simple topic index mapping
 // In production, you might load this from a JSON file or database
@@ -16,12 +17,12 @@ const topicIndex: Record<string, { book: string; chapter: number; verse: number 
   ],
   hope: [
     { book: "Romans", chapter: 15, verse: 13 },
-    { book: "Psalm", chapter: 42, verse: 5 },
+    { book: "Psalms", chapter: 42, verse: 5 },
   ],
 };
 
 export async function OPTIONS() {
-  return new NextResponse(null, { status: 204, headers: corsHeaders });
+  return optionsResponse();
 }
 
 export async function GET(
@@ -29,41 +30,35 @@ export async function GET(
   { params }: { params: Promise<{ bible: string; keyword: string }> }
 ) {
   const { bible, keyword } = await params;
+  const versionInfo = getBibleVersionInfo(bible);
 
   if (!keyword) {
-    return NextResponse.json(
-      { error: "Path parameter 'keyword' is required. Example: /api/KJbible/topic/faith" },
-      { status: 400, headers: corsHeaders }
-    );
+    return errorResponse(400, "Path parameter 'keyword' is required. Example: /api/KJV/topic/faith");
   }
 
   const bibleData = await getBibleData(bible);
   if (!bibleData) {
-    return NextResponse.json(
-      { error: `Bible version '${bible}' not found. Use /api/versions to see available versions.` },
-      { status: 404, headers: corsHeaders }
-    );
+    return errorResponse(404, `Bible version '${bible}' not found. Use /api/versions to see available versions.`);
   }
 
   const keywordLower = keyword.toLowerCase();
   const topicVerses = topicIndex[keywordLower];
 
   if (!topicVerses || topicVerses.length === 0) {
-    return NextResponse.json(
+    return jsonResponse(
       {
-        version: bible,
+        version: versionInfo?.id ?? bible,
         topic: keyword,
         count: 0,
         results: [],
         message: `No verses mapped for topic '${keyword}'.`,
       },
-      { headers: corsHeaders }
     );
   }
 
   // Fetch the verse text from Bible data
   const results = topicVerses.map((ref) => {
-    const bookData = bibleData.find((b) => b.book.toLowerCase() === ref.book.toLowerCase());
+    const bookData = findBook(bibleData, ref.book);
     if (!bookData) return null;
     const chapterData = bookData.chapters.find((c) => toNum(c.chapter) === ref.chapter);
     if (!chapterData) return null;
@@ -77,13 +72,12 @@ export async function GET(
     };
   }).filter(Boolean); // remove nulls
 
-  return NextResponse.json(
+  return jsonResponse(
     {
-      version: bible,
+      version: versionInfo?.id ?? bible,
       topic: keyword,
       count: results.length,
       results,
     },
-    { headers: corsHeaders }
   );
 }

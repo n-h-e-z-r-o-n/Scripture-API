@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getBibleData, findBook } from "@/lib/bibleUtils";
+import { NextRequest } from "next/server";
+import { findBook, getBibleData, getBibleVersionInfo } from "@/lib/bibleUtils";
+import { cacheControl, errorResponse, jsonResponse } from "@/lib/api";
 
 export async function GET(
   request: NextRequest,
@@ -8,21 +9,16 @@ export async function GET(
   const { bible, book } = await params;
 
   const bibleData = await getBibleData(bible);
+  const versionInfo = getBibleVersionInfo(bible);
 
   if (!bibleData) {
-    return NextResponse.json(
-      { error: `Bible '${bible}' not found` },
-      { status: 404 }
-    );
+    return errorResponse(404, `Bible '${bible}' not found`);
   }
 
   const bookData = findBook(bibleData, book);
 
   if (!bookData) {
-    return NextResponse.json(
-      { error: `Book '${book}' not found` },
-      { status: 404 }
-    );
+    return errorResponse(404, `Book '${book}' not found`);
   }
 
   let totalVerses = 0;
@@ -38,17 +34,16 @@ export async function GET(
     };
   });
 
-  return NextResponse.json(
+  return jsonResponse(
     {
+      version: versionInfo?.id ?? bible,
       book: bookData.book,
       chapters: bookData.chapters.length,
       totalVerses,
       chapterSummary
     },
     {
-      headers: {
-        "Cache-Control": "public, s-maxage=86400"
-      }
+      headers: cacheControl(86400)
     }
   );
 }

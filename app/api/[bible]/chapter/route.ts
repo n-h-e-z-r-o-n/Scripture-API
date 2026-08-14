@@ -16,7 +16,7 @@ export async function GET(
 
   if (!bookName || !chapterNum) {
     return NextResponse.json(
-      { error: "Query parameters 'book' and 'chapter' are required. Example: /api/KJbible/chapter?book=Genesis&chapter=1" },
+      { error: "Query parameters 'book' and 'chapter' are required. Example: /api/KJV/chapter?book=Genesis&chapter=1" },
       { status: 400, headers: corsHeaders }
     );
   }

@@ -1,5 +1,6 @@
 import { promises as fs } from 'fs';
 import path from 'path';
+import { REGISTERED_BIBLE_VERSIONS, resolveBibleVersion, type BibleVersionInfo } from '@/lib/versionCatalog';
 
 export interface Verse {
   verse: string | number;
@@ -17,26 +18,36 @@ export interface Book {
 }
 
 export type BibleData = Book[];
+export interface VerseLocation {
+  book: string;
+  chapter: number;
+  verse: number;
+  text: string;
+}
 
 // In-memory cache for loaded Bibles
 const bibleCache: Record<string, BibleData> = {};
 
 /**
- * Lazily loads a Bible dataset from the /data folder based on the version name.
+ * Lazily loads a Bible dataset from the /data/bibles folder based on the version name.
  * If already loaded, returns the cached data.
  */
 export async function getBibleData(version: string): Promise<BibleData | null> {
-  const sanitizedVersion = version.replace(/[^a-zA-Z0-9_-]/g, '');
-  if (bibleCache[sanitizedVersion]) {
-    return bibleCache[sanitizedVersion];
+  const resolvedVersion = resolveBibleVersion(version);
+  if (!resolvedVersion) {
+    return null;
   }
 
-  const filePath = path.join(process.cwd(), 'data', `${sanitizedVersion}.json`);
+  if (bibleCache[resolvedVersion.id]) {
+    return bibleCache[resolvedVersion.id];
+  }
+
+  const filePath = path.join(process.cwd(), 'data', 'bibles', `${resolvedVersion.fileName}.json`);
 
   try {
     const fileContents = await fs.readFile(filePath, 'utf8');
     const data: BibleData = JSON.parse(fileContents);
-    bibleCache[sanitizedVersion] = data;
+    bibleCache[resolvedVersion.id] = data;
     return data;
   } catch (error: unknown) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
@@ -47,13 +58,26 @@ export async function getBibleData(version: string): Promise<BibleData | null> {
   }
 }
 
-/** Returns available version names by reading the /data directory. */
-export async function getAvailableVersions(): Promise<string[]> {
-  const dataDir = path.join(process.cwd(), 'data');
-  const files = await fs.readdir(dataDir);
-  return files
-    .filter((f) => f.endsWith('.json'))
-    .map((f) => f.replace('.json', ''));
+/** Returns registered public versions whose dataset file is present. */
+export async function getAvailableVersions(): Promise<BibleVersionInfo[]> {
+  const versions = await Promise.all(
+    REGISTERED_BIBLE_VERSIONS.map(async (version) => {
+      const filePath = path.join(process.cwd(), 'data', 'bibles', `${version.fileName}.json`);
+
+      try {
+        await fs.access(filePath);
+        return version;
+      } catch {
+        return null;
+      }
+    })
+  );
+
+  return versions.filter((version): version is BibleVersionInfo => version !== null);
+}
+
+export function getBibleVersionInfo(version: string): BibleVersionInfo | null {
+  return resolveBibleVersion(version);
 }
 
 /**
@@ -85,7 +109,7 @@ export function findVerse(chapter: Chapter, verseNum: string | number): Verse | 
 /** Safely parses a chapter or verse field to a number. Falls back to the string. */
 export function toNum(val: string | number): number {
   const n = parseInt(String(val), 10);
-  return isNaN(n) ? (val as number) : n;
+  return Number.isNaN(n) ? Number(val) : n;
 }
 
 /** Standard CORS headers to attach to every API response. */
@@ -94,3 +118,29 @@ export const corsHeaders = {
   'Access-Control-Allow-Methods': 'GET, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
 };
+
+export function flattenBibleVerses(
+  bibleData: BibleData,
+  predicate?: (book: Book) => boolean
+): VerseLocation[] {
+  const verses: VerseLocation[] = [];
+
+  for (const book of bibleData) {
+    if (predicate && !predicate(book)) {
+      continue;
+    }
+
+    for (const chapter of book.chapters) {
+      for (const verse of chapter.verses) {
+        verses.push({
+          book: book.book,
+          chapter: toNum(chapter.chapter),
+          verse: toNum(verse.verse),
+          text: verse.text,
+        });
+      }
+    }
+  }
+
+  return verses;
+}

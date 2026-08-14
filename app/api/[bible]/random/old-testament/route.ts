@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { corsHeaders, getBibleData, toNum } from '@/lib/bibleUtils';
+import { NextRequest } from 'next/server';
+import { flattenBibleVerses, getBibleData, getBibleVersionInfo } from '@/lib/bibleUtils';
+import { errorResponse, jsonResponse, optionsResponse } from '@/lib/api';
 
 export async function OPTIONS() {
-  return new NextResponse(null, { status: 204, headers: corsHeaders });
+  return optionsResponse();
 }
 
 // Canonical Old Testament books
@@ -22,48 +23,27 @@ export async function GET(
   { params }: { params: Promise<{ bible: string }> }
 ) {
   const { bible } = await params;
+  const versionInfo = getBibleVersionInfo(bible);
 
   const bibleData = await getBibleData(bible);
 
   if (!bibleData) {
-    return NextResponse.json(
-      { error: `Bible version '${bible}' not found.` },
-      { status: 404, headers: corsHeaders }
-    );
+    return errorResponse(404, `Bible version '${bible}' not found.`);
   }
 
-  // Filter only Old Testament books
-  const otBooks = bibleData.filter(book =>
-    OLD_TESTAMENT_BOOKS.includes(book.book)
-  );
+  const otVerses = flattenBibleVerses(bibleData, (book) => OLD_TESTAMENT_BOOKS.includes(book.book));
 
-  if (otBooks.length === 0) {
-    return NextResponse.json(
-      { error: "Old Testament books not found in this translation." },
-      { status: 404, headers: corsHeaders }
-    );
+  if (otVerses.length === 0) {
+    return errorResponse(404, "Old Testament books not found in this translation.");
   }
 
-  // Random book
-  const randomBook = otBooks[Math.floor(Math.random() * otBooks.length)];
+  const randomVerse = otVerses[Math.floor(Math.random() * otVerses.length)];
 
-  // Random chapter
-  const randomChapter =
-    randomBook.chapters[Math.floor(Math.random() * randomBook.chapters.length)];
-
-  // Random verse
-  const randomVerse =
-    randomChapter.verses[Math.floor(Math.random() * randomChapter.verses.length)];
-
-  return NextResponse.json(
+  return jsonResponse(
     {
-      version: bible,
+      version: versionInfo?.id ?? bible,
       testament: "Old",
-      book: randomBook.book,
-      chapter: toNum(randomChapter.chapter),
-      verse: toNum(randomVerse.verse),
-      text: randomVerse.text
+      ...randomVerse
     },
-    { headers: corsHeaders }
   );
 }

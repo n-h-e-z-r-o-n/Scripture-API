@@ -1,32 +1,39 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import {
-  corsHeaders,
   getBibleData,
   findBook,
   findChapter,
+  getBibleVersionInfo,
   toNum,
 } from "@/lib/bibleUtils";
+import { errorResponse, jsonResponse } from "@/lib/api";
 
 /**
  * Simple parser for Bible references like:
  * "John 3:16-18" or "Genesis 1:31-2:3"
  */
 function parseReference(ref: string) {
-  // Split by spaces: ["John", "3:16-18"]
-  const [bookName, versePart] = ref.split(" ", 2);
-  if (!bookName || !versePart) return null;
+  const trimmed = ref.trim().replace(/\s+/g, " ");
+  const match = trimmed.match(/^(.+?)\s+(\d+:\d+(?:-\d+(?::\d+)?)?)$/);
+
+  if (!match) {
+    return null;
+  }
+
+  const bookName = match[1];
+  const versePart = match[2];
 
   // Split chapter and verse range
   // "3:16-18" or "1:31-2:3"
   const rangeRegex = /^(\d+):(\d+)(?:-(?:(\d+):)?(\d+))?$/;
-  const match = versePart.match(rangeRegex);
+  const rangeMatch = versePart.match(rangeRegex);
 
-  if (!match) return null;
+  if (!rangeMatch) return null;
 
-  const startChapter = Number(match[1]);
-  const startVerse = Number(match[2]);
-  const endChapter = match[3] ? Number(match[3]) : startChapter;
-  const endVerse = match[4] ? Number(match[4]) : startVerse;
+  const startChapter = Number(rangeMatch[1]);
+  const startVerse = Number(rangeMatch[2]);
+  const endChapter = rangeMatch[3] ? Number(rangeMatch[3]) : startChapter;
+  const endVerse = rangeMatch[4] ? Number(rangeMatch[4]) : startVerse;
 
   return {
     bookName,
@@ -42,41 +49,27 @@ export async function GET(
   { params }: { params: Promise<{ bible: string; reference: string }> }
 ) {
   const { bible, reference } = await params;
+  const versionInfo = getBibleVersionInfo(bible);
 
   if (!reference) {
-    return NextResponse.json(
-      {
-        error:
-          "Reference parameter is required. Example: /api/KJbible/ref/John 3:16-18",
-      },
-      { status: 400, headers: corsHeaders }
-    );
+    return errorResponse(400, "Reference parameter is required. Example: /api/KJV/ref/John%203%3A16-18");
   }
 
   const ref = parseReference(decodeURIComponent(reference));
   if (!ref) {
-    return NextResponse.json(
-      { error: `Invalid reference format: '${reference}'` },
-      { status: 400, headers: corsHeaders }
-    );
+    return errorResponse(400, `Invalid reference format: '${reference}'`);
   }
 
   const { bookName, startChapter, startVerse, endChapter, endVerse } = ref;
 
   const bibleData = await getBibleData(bible);
   if (!bibleData) {
-    return NextResponse.json(
-      { error: `Bible version '${bible}' not found.` },
-      { status: 404, headers: corsHeaders }
-    );
+    return errorResponse(404, `Bible version '${bible}' not found.`);
   }
 
   const book = findBook(bibleData, bookName);
   if (!book) {
-    return NextResponse.json(
-      { error: `Book '${bookName}' not found in version '${bible}'.` },
-      { status: 404, headers: corsHeaders }
-    );
+    return errorResponse(404, `Book '${bookName}' not found in version '${bible}'.`);
   }
 
   // Collect verses across chapters if needed
@@ -99,21 +92,17 @@ export async function GET(
   }
 
   if (verses.length === 0) {
-    return NextResponse.json(
-      { error: `No verses found for reference '${reference}' in ${book.book}.` },
-      { status: 404, headers: corsHeaders }
-    );
+    return errorResponse(404, `No verses found for reference '${reference}' in ${book.book}.`);
   }
 
-  return NextResponse.json(
+  return jsonResponse(
     {
-      version: bible,
+      version: versionInfo?.id ?? bible,
       book: book.book,
       start: { chapter: startChapter, verse: startVerse },
       end: { chapter: endChapter, verse: endVerse },
       verseCount: verses.length,
       verses,
     },
-    { headers: corsHeaders }
   );
 }

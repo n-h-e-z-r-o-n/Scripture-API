@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { corsHeaders, getBibleData, toNum } from '@/lib/bibleUtils';
+import { NextRequest } from 'next/server';
+import { flattenBibleVerses, getBibleData, getBibleVersionInfo } from '@/lib/bibleUtils';
+import { errorResponse, jsonResponse, optionsResponse } from '@/lib/api';
 
 export async function OPTIONS() {
-  return new NextResponse(null, { status: 204, headers: corsHeaders });
+  return optionsResponse();
 }
 
 // Canonical New Testament books
@@ -20,48 +21,27 @@ export async function GET(
   { params }: { params: Promise<{ bible: string }> }
 ) {
   const { bible } = await params;
+  const versionInfo = getBibleVersionInfo(bible);
 
   const bibleData = await getBibleData(bible);
 
   if (!bibleData) {
-    return NextResponse.json(
-      { error: `Bible version '${bible}' not found.` },
-      { status: 404, headers: corsHeaders }
-    );
+    return errorResponse(404, `Bible version '${bible}' not found.`);
   }
 
-  // Filter only New Testament books
-  const ntBooks = bibleData.filter(book =>
-    NEW_TESTAMENT_BOOKS.includes(book.book)
-  );
+  const ntVerses = flattenBibleVerses(bibleData, (book) => NEW_TESTAMENT_BOOKS.includes(book.book));
 
-  if (ntBooks.length === 0) {
-    return NextResponse.json(
-      { error: "New Testament books not found in this translation." },
-      { status: 404, headers: corsHeaders }
-    );
+  if (ntVerses.length === 0) {
+    return errorResponse(404, "New Testament books not found in this translation.");
   }
 
-  // Pick random book
-  const randomBook = ntBooks[Math.floor(Math.random() * ntBooks.length)];
+  const randomVerse = ntVerses[Math.floor(Math.random() * ntVerses.length)];
 
-  // Pick random chapter
-  const randomChapter =
-    randomBook.chapters[Math.floor(Math.random() * randomBook.chapters.length)];
-
-  // Pick random verse
-  const randomVerse =
-    randomChapter.verses[Math.floor(Math.random() * randomChapter.verses.length)];
-
-  return NextResponse.json(
+  return jsonResponse(
     {
-      version: bible,
+      version: versionInfo?.id ?? bible,
       testament: "New",
-      book: randomBook.book,
-      chapter: toNum(randomChapter.chapter),
-      verse: toNum(randomVerse.verse),
-      text: randomVerse.text
+      ...randomVerse
     },
-    { headers: corsHeaders }
   );
 }

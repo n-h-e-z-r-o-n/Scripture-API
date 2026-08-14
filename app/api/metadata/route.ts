@@ -1,20 +1,20 @@
-import { NextResponse } from 'next/server';
-import { corsHeaders, getAvailableVersions } from '@/lib/bibleUtils';
+import { getAvailableVersions } from '@/lib/bibleUtils';
+import { jsonResponse, optionsResponse } from '@/lib/api';
 
 export async function OPTIONS() {
-  return new NextResponse(null, { status: 204, headers: corsHeaders });
+  return optionsResponse();
 }
 
 export async function GET() {
   try {
     const versions = await getAvailableVersions();
 
-    return NextResponse.json(
+    return jsonResponse(
       {
         name: 'Scripture API',
-        description: 'Lightweight multi-version Bible API',
+        description: 'Lightweight Bible API for registered public-domain datasets',
         status: 'ok',
-        api_version: '1.0.0',
+        api_version: '1.1.0',
         timestamp: new Date().toISOString(),
         documentation: 'https://github.com/n-h-e-z-r-o-n/Scripture-API',
         contact: {
@@ -31,20 +31,25 @@ export async function GET() {
           search: '/api/{version}/search?q=faith',
           random: '/api/{version}/random',
           passage: '/api/{version}/passage?book=John&chapter=3&start=16&end=18',
+          reference: '/api/{version}/ref/John%203%3A16-18',
           daily: '/api/{version}/daily',
         },
         versions: {
           count: versions.length,
-          items: versions,
+          items: versions.map((version) => ({
+            id: version.id,
+            name: version.name,
+            abbreviation: version.abbreviation,
+            language: version.language,
+          })),
         },
       },
-      { headers: corsHeaders }
     );
   } catch (error) {
     console.error('Failed to build metadata response', error);
-    return NextResponse.json(
+    return jsonResponse(
       { error: 'Failed to build API metadata' },
-      { status: 500, headers: corsHeaders }
+      { status: 500 }
     );
   }
 }

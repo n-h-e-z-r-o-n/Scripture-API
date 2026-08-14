@@ -26,7 +26,7 @@ export async function GET(
     return NextResponse.json(
       {
         error:
-          "Query parameters 'book', 'chapter', 'start', and 'end' are required. Example: /api/KJbible/passage?book=John&chapter=3&start=16&end=18",
+          "Query parameters 'book', 'chapter', 'start', and 'end' are required. Example: /api/KJV/passage?book=John&chapter=3&start=16&end=18",
       },
       { status: 400, headers: corsHeaders }
     );

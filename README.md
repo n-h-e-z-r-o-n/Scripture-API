@@ -39,7 +39,7 @@ Public demo endpoint: https://scripture-api.vercel.app/
 ## Key Features
 
 - **Blazing Fast**: Serves data directly from local memory using Next.js App Router, requiring no external database lookup.
-- **Dynamic Translation Support**: Automatically parses any `.json` file placed into the `/data` directory and serves it dynamically at `/api/[bible]/`.
+- **Registered Translation Support**: Exposes explicitly registered public-domain datasets and accepts stable aliases such as `KJV` and `KJbible`.
 - **Comprehensive API**: Granular fetching mechanisms including endpoints for books, chapters, passages, metadata, statistics, and full-text search.
 - **Serverless Ready**: Designed cleanly to be deployed directly to Vercel and leverage Edge caching mechanisms out of the box.
 
@@ -58,7 +58,7 @@ Planned improvements may include:
 
 ### Requirements
 
-- [Node.js](https://nodejs.org/) 18+ recommended
+- [Node.js](https://nodejs.org/) 20.9+ recommended
 - npm, pnpm, or yarn
 
 ### Installation
@@ -81,8 +81,8 @@ curl "http://localhost:3000/api/versions"
 # Fetch a book from the KJV Bible
 curl "http://localhost:3000/api/KJV/book?book=Genesis"
 
-# Fetch a specific verse from the ASV
-curl "http://localhost:3000/api/ASV/verse?book=John&chapter=3&verse=16"
+# Fetch a specific verse from the KJV
+curl "http://localhost:3000/api/KJV/verse?book=John&chapter=3&verse=16"
 
 # Global Search in the KJV
 curl "http://localhost:3000/api/KJV/search?q=faith"
@@ -91,9 +91,9 @@ curl "http://localhost:3000/api/KJV/search?q=faith"
 ## Deployment Notes
 
 - Deploy seamlessly using [Vercel](https://vercel.com).
-- No database variables are required since this utilizes the local `/data` directory. 
+- No database variables are required since this utilizes the local `/data/bibles` directory. 
 - You can heavily cache responses by using Next.js standard cache control semantics to limit processing compute on serverless environments.
-- Be extremely mindful of the copyright status of files you upload or commit into your `/data` folder on public remote repositories.
+- Be extremely mindful of the copyright status of files you upload or commit into your `/data/bibles` folder on public remote repositories.
 
 ## Clone vs Fork Guidance
 
@@ -144,7 +144,12 @@ console.log(data);
 
 ```javascript
 {
-  versions: ["KJV", "ASV"]
+  versions: [
+    {
+      id: "KJV",
+      name: "King James Version"
+    }
+  ]
 }
 ```
 
@@ -867,10 +872,11 @@ Please ensure:
 > 
 > ### Dataset Responsibility
 > 
-> The repository does **not bundle Bible datasets** by default. If you add datasets to the `/data` directory or elsewhere:
+> The repository currently registers only public-domain datasets. If you add datasets to `/data/bibles`, they are **not** exposed automatically:
 > 
 > * You are responsible for verifying that the text is **legally distributable**.
 > * You must ensure that you comply with **copyright laws and licensing requirements** in your jurisdiction.
+> * You should explicitly register only public-domain or properly licensed datasets before exposing them through the API.
 > * The maintainers of this project assume **no responsibility for improperly distributed datasets**.
 > 
 > ### Distribution and Hosting

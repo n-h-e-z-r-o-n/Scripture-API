@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { corsHeaders, getBibleData } from '@/lib/bibleUtils';
+import { NextRequest } from 'next/server';
+import { getBibleData, getBibleVersionInfo } from '@/lib/bibleUtils';
+import { errorResponse, jsonResponse, optionsResponse } from '@/lib/api';
 
 export async function OPTIONS() {
-  return new NextResponse(null, { status: 204, headers: corsHeaders });
+  return optionsResponse();
 }
 
 export async function GET(
@@ -11,12 +12,10 @@ export async function GET(
 ) {
   const { bible } = await params;
   const bibleData = await getBibleData(bible);
+  const versionInfo = getBibleVersionInfo(bible);
 
   if (!bibleData) {
-    return NextResponse.json(
-      { error: `Bible version '${bible}' not found. Use /api/versions to see available versions.` },
-      { status: 404, headers: corsHeaders }
-    );
+    return errorResponse(404, `Bible version '${bible}' not found. Use /api/versions to see available versions.`);
   }
 
   const chapterCount = bibleData.reduce((sum, book) => sum + book.chapters.length, 0);
@@ -25,14 +24,16 @@ export async function GET(
     0
   );
 
-  return NextResponse.json(
+  return jsonResponse(
     {
-      version: bible,
+      version: versionInfo?.id ?? bible,
+      name: versionInfo?.name ?? bible,
+      abbreviation: versionInfo?.abbreviation ?? bible,
+      language: versionInfo?.language ?? 'Unknown',
       status: 'ok',
       books: bibleData.length,
       chapters: chapterCount,
       verses: verseCount,
     },
-    { headers: corsHeaders }
   );
 }

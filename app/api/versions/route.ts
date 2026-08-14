@@ -1,19 +1,28 @@
-import { NextResponse } from 'next/server';
-import { corsHeaders, getAvailableVersions } from '@/lib/bibleUtils';
+import { getAvailableVersions } from '@/lib/bibleUtils';
+import { jsonResponse, optionsResponse } from '@/lib/api';
 
 export async function OPTIONS() {
-  return new NextResponse(null, { status: 204, headers: corsHeaders });
+  return optionsResponse();
 }
 
 export async function GET() {
   try {
     const versions = await getAvailableVersions();
-    return NextResponse.json({ versions, count: versions.length }, { headers: corsHeaders });
+    return jsonResponse({
+      count: versions.length,
+      versions: versions.map((version) => ({
+        id: version.id,
+        name: version.name,
+        abbreviation: version.abbreviation,
+        language: version.language,
+        aliases: version.aliases,
+      })),
+    });
   } catch (error) {
     console.error('Failed to read data directory', error);
-    return NextResponse.json(
+    return jsonResponse(
       { error: 'Failed to read available versions' },
-      { status: 500, headers: corsHeaders }
+      { status: 500 }
     );
   }
 }

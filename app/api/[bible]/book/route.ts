@@ -14,7 +14,7 @@ export async function GET(
 
   if (!bookName) {
     return NextResponse.json(
-      { error: "Query parameter 'name' is required. Example: /api/KJbible/book?name=Genesis" },
+      { error: "Query parameter 'name' is required. Example: /api/KJV/book?name=Genesis" },
       { status: 400, headers: corsHeaders }
     );
   }

@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { corsHeaders, getBibleData, toNum } from '@/lib/bibleUtils';
+import { NextRequest } from 'next/server';
+import { getBibleData, getBibleVersionInfo, toNum } from '@/lib/bibleUtils';
+import { errorResponse, jsonResponse, optionsResponse } from '@/lib/api';
 
 export async function OPTIONS() {
-  return new NextResponse(null, { status: 204, headers: corsHeaders });
+  return optionsResponse();
 }
 
 export async function GET(
@@ -13,66 +14,61 @@ export async function GET(
   const version = resolvedParams.bible;
   
   const searchParams = request.nextUrl.searchParams;
-  const query = searchParams.get('q');
+  const query = searchParams.get('q')?.trim();
+  const limitParam = searchParams.get('limit');
+  const offsetParam = searchParams.get('offset');
+  const versionInfo = getBibleVersionInfo(version);
 
   if (!query) {
-    return NextResponse.json(
-      { error: "Query parameter 'q' is required. Ex: /api/KJbible/search?q=faith" },
-      { status: 400, headers: corsHeaders }
-    );
+    return errorResponse(400, "Query parameter 'q' is required. Example: /api/KJV/search?q=faith");
+  }
+
+  const limit = limitParam ? Number.parseInt(limitParam, 10) : 25;
+  const offset = offsetParam ? Number.parseInt(offsetParam, 10) : 0;
+
+  if (!Number.isInteger(limit) || limit < 1 || limit > 100) {
+    return errorResponse(400, "Query parameter 'limit' must be an integer between 1 and 100.");
+  }
+
+  if (!Number.isInteger(offset) || offset < 0) {
+    return errorResponse(400, "Query parameter 'offset' must be a non-negative integer.");
   }
 
   const bibleData = await getBibleData(version);
   if (!bibleData) {
-    return NextResponse.json(
-      { error: `Bible version '${version}' not found. Use /api/versions to see available versions.` },
-      { status: 404, headers: corsHeaders }
-    );
+    return errorResponse(404, `Bible version '${version}' not found. Use /api/versions to see available versions.`);
   }
 
   const lowerQuery = query.toLowerCase();
-  const results = [];
-  
-  // Search limit to prevent overwhelming responses
-  const MAX_RESULTS = 100;
+  const matches: Array<{ book: string; chapter: number; verse: number; text: string }> = [];
 
   for (const book of bibleData) {
     for (const chapter of book.chapters) {
       for (const verse of chapter.verses) {
         if (verse.text.toLowerCase().includes(lowerQuery)) {
-          results.push({
+          matches.push({
             book: book.book,
             chapter: toNum(chapter.chapter),
             verse: toNum(verse.verse),
             text: verse.text
           });
-          
-          if (results.length >= MAX_RESULTS) {
-            return NextResponse.json(
-              {
-                version,
-                query,
-                count: results.length,
-                limitReached: true,
-                message: `Results capped at ${MAX_RESULTS}.`,
-                results,
-              },
-              { headers: corsHeaders }
-            );
-          }
         }
       }
     }
   }
 
-  return NextResponse.json(
+  const results = matches.slice(offset, offset + limit);
+
+  return jsonResponse(
     {
-      version,
+      version: versionInfo?.id ?? version,
       query,
-      count: results.length,
-      limitReached: false,
+      offset,
+      limit,
+      returned: results.length,
+      totalMatches: matches.length,
+      hasMore: offset + results.length < matches.length,
       results,
     },
-    { headers: corsHeaders }
   );
 }

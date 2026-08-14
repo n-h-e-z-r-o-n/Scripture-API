@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { corsHeaders, getBibleData, findBook, toNum } from '@/lib/bibleUtils';
+import { NextRequest } from 'next/server';
+import { findBook, flattenBibleVerses, getBibleData, getBibleVersionInfo } from '@/lib/bibleUtils';
+import { errorResponse, jsonResponse, optionsResponse } from '@/lib/api';
 
 export async function OPTIONS() {
-  return new NextResponse(null, { status: 204, headers: corsHeaders });
+  return optionsResponse();
 }
 
 export async function GET(
@@ -10,54 +11,31 @@ export async function GET(
   { params }: { params: Promise<{ bible: string; book: string }> }
 ) {
   const { bible, book } = await params;
+  const versionInfo = getBibleVersionInfo(bible);
 
   if (!book) {
-    return NextResponse.json(
-      {
-        error: "Book parameter is required. Example: /api/KJbible/random/book/Genesis"
-      },
-      { status: 400, headers: corsHeaders }
-    );
+    return errorResponse(400, "Book parameter is required. Example: /api/KJV/random/Genesis");
   }
 
   const bibleData = await getBibleData(bible);
 
   if (!bibleData) {
-    return NextResponse.json(
-      {
-        error: `Bible version '${bible}' not found. Use /api/versions to see available versions.`
-      },
-      { status: 404, headers: corsHeaders }
-    );
+    return errorResponse(404, `Bible version '${bible}' not found. Use /api/versions to see available versions.`);
   }
 
   const bookData = findBook(bibleData, book);
 
   if (!bookData) {
-    return NextResponse.json(
-      {
-        error: `Book '${book}' not found in version '${bible}'.`
-      },
-      { status: 404, headers: corsHeaders }
-    );
+    return errorResponse(404, `Book '${book}' not found in version '${bible}'.`);
   }
 
-  // Pick random chapter
-  const randomChapterIndex = Math.floor(Math.random() * bookData.chapters.length);
-  const chapter = bookData.chapters[randomChapterIndex];
+  const verses = flattenBibleVerses(bibleData, (candidate) => candidate.book === bookData.book);
+  const verse = verses[Math.floor(Math.random() * verses.length)];
 
-  // Pick random verse
-  const randomVerseIndex = Math.floor(Math.random() * chapter.verses.length);
-  const verse = chapter.verses[randomVerseIndex];
-
-  return NextResponse.json(
+  return jsonResponse(
     {
-      version: bible,
-      book: bookData.book,
-      chapter: toNum(chapter.chapter),
-      verse: toNum(verse.verse),
-      text: verse.text
+      version: versionInfo?.id ?? bible,
+      ...verse
     },
-    { headers: corsHeaders }
   );
 }

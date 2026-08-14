@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { corsHeaders, getBibleData, toNum } from '@/lib/bibleUtils';
+import { NextRequest } from 'next/server';
+import { flattenBibleVerses, getBibleData, getBibleVersionInfo } from '@/lib/bibleUtils';
+import { errorResponse, jsonResponse, optionsResponse } from '@/lib/api';
 
 export async function OPTIONS() {
-  return new NextResponse(null, { status: 204, headers: corsHeaders });
+  return optionsResponse();
 }
 
 export async function GET(
@@ -11,35 +12,24 @@ export async function GET(
 ) {
   const resolvedParams = await params;
   const version = resolvedParams.bible;
+  const versionInfo = getBibleVersionInfo(version);
 
   const bibleData = await getBibleData(version);
   if (!bibleData) {
-    return NextResponse.json(
-      { error: `Bible version '${version}' not found. Use /api/versions to see available versions.` },
-      { status: 404, headers: corsHeaders }
-    );
+    return errorResponse(404, `Bible version '${version}' not found. Use /api/versions to see available versions.`);
   }
 
-  // Pick a random book
-  const randomBookIndex = Math.floor(Math.random() * bibleData.length);
-  const book = bibleData[randomBookIndex];
+  const verses = flattenBibleVerses(bibleData);
+  if (verses.length === 0) {
+    return errorResponse(404, `No verse data found for '${version}'.`);
+  }
 
-  // Pick a random chapter
-  const randomChapterIndex = Math.floor(Math.random() * book.chapters.length);
-  const chapter = book.chapters[randomChapterIndex];
+  const verse = verses[Math.floor(Math.random() * verses.length)];
 
-  // Pick a random verse
-  const randomVerseIndex = Math.floor(Math.random() * chapter.verses.length);
-  const verse = chapter.verses[randomVerseIndex];
-
-  return NextResponse.json(
+  return jsonResponse(
     {
-      version,
-      book: book.book,
-      chapter: toNum(chapter.chapter),
-      verse: toNum(verse.verse),
-      text: verse.text,
+      version: versionInfo?.id ?? version,
+      ...verse,
     },
-    { headers: corsHeaders }
   );
 }
