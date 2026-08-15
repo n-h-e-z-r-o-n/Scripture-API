@@ -24,6 +24,8 @@ export async function GET() {
           metadata: '/api/metadata',
           versions: '/api/versions',
           health: '/api/health',
+          motivations: '/api/motivations',
+          motivation_category: '/api/motivations/{category}',
           books: '/api/{version}/books',
           book: '/api/{version}/book?name=Genesis',
           chapter: '/api/{version}/chapter?book=Genesis&chapter=1',

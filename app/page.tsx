@@ -68,6 +68,8 @@ const endpointGroups: EndpointGroup[] = [
             metadata: '/api/metadata',
             versions: '/api/versions',
             health: '/api/health',
+            motivations: '/api/motivations',
+            motivation_category: '/api/motivations/{category}',
             books: '/api/{version}/books',
             book: '/api/{version}/book?name=Genesis',
             chapter: '/api/{version}/chapter?book=Genesis&chapter=1',
@@ -104,6 +106,60 @@ const endpointGroups: EndpointGroup[] = [
           datasets: 'loaded-from-disk',
           bible_versions: ['KJV'],
           bible_versions_count: 1,
+        },
+      },
+      {
+        id: 'motivations',
+        title: 'Motivation Categories',
+        path: '/api/motivations',
+        description: 'Lists all available motivation categories and their item counts, or returns random/category-scoped motivation data via query params.',
+        exampleRequest: '/api/motivations',
+        params: [
+          { name: 'category', location: 'query', required: false, description: 'Optional category slug such as faith_and_courage.' },
+          { name: 'random', location: 'query', required: false, description: 'Use true or 1 to return random motivation entries.' },
+          { name: 'limit', location: 'query', required: false, description: 'Maximum result count from 1 to 100. Defaults to 25.' },
+          { name: 'offset', location: 'query', required: false, description: 'Zero-based offset for non-random category results. Defaults to 0.' },
+        ],
+        response: {
+          count: 20,
+          categories: [
+            {
+              slug: 'faith_and_courage',
+              title: 'Faith And Courage',
+              count: 12,
+              href: '/api/motivations/faith_and_courage',
+            },
+          ],
+        },
+        notes: [
+          'Use `/api/motivations?category=faith_and_courage` to query a category from the index route.',
+          'Use `/api/motivations?random=true&limit=3` for random entries across all categories.',
+        ],
+      },
+      {
+        id: 'motivation-category',
+        title: 'Motivation Category',
+        path: '/api/motivations/{category}',
+        description: 'Returns motivations for one category, with optional pagination or random selection.',
+        exampleRequest: '/api/motivations/faith_and_courage?limit=5',
+        params: [
+          { name: 'category', location: 'path', required: true, description: 'Category slug such as faith_and_courage.' },
+          { name: 'random', location: 'query', required: false, description: 'Use true or 1 to return random category entries.' },
+          { name: 'limit', location: 'query', required: false, description: 'Maximum result count from 1 to 100. Defaults to 25.' },
+          { name: 'offset', location: 'query', required: false, description: 'Zero-based offset for non-random results. Defaults to 0.' },
+        ],
+        response: {
+          category: 'faith_and_courage',
+          title: 'Faith And Courage',
+          total: 12,
+          returned: 5,
+          offset: 0,
+          limit: 5,
+          random: false,
+          motivations: [
+            { id: 1, text: 'Faith walks forward before the path is fully visible.' },
+            { id: 2, text: 'Courage begins where comfort stops being your master.' },
+          ],
         },
       },
     ],
@@ -524,6 +580,10 @@ export default async function HomePage() {
       title: 'Search pagination',
       body: 'Search exposes `limit`, `offset`, `returned`, `totalMatches`, and `hasMore` for predictable pagination.',
     },
+    {
+      title: 'Motivation categories',
+      body: 'Motivation endpoints expose category discovery, pagination, and random sampling from local JSON data under `data/bible_motivation`.',
+    },
   ];
 
   return (
@@ -540,7 +600,7 @@ export default async function HomePage() {
               </h1>
               <p className="max-w-3xl text-base leading-7 text-slate-700 sm:text-lg sm:leading-8">
                 Public-domain Bible API with version-aware routes for metadata, reading, summaries, search,
-                topic lookup, daily verses, and random selection.
+                topic lookup, daily verses, random selection, and curated motivation categories.
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
